@@ -26,7 +26,7 @@
 <meta property="og:description" content="阅读MySQL必知必会做的笔记，看完忘了就不好了(">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-10-18T07:52:53.000Z">
-<meta property="article:modified_time" content="2024-10-22T08:36:23.808Z">
+<meta property="article:modified_time" content="2024-10-22T08:39:45.764Z">
 <meta property="article:author" content="GuangYing">
 <meta property="article:tag" content="笔记">
 <meta property="article:tag" content="MySQL">
@@ -419,8 +419,8 @@
     
         <span class="article-date article-meta-item">
             <i class="fa-regular fa-wrench"></i>&nbsp;
-            <span class="desktop">2024-10-22 16:36:23</span>
-            <span class="mobile">2024-10-22 16:36:23</span>
+            <span class="desktop">2024-10-22 16:39:45</span>
+            <span class="mobile">2024-10-22 16:39:45</span>
             <span class="hover-info">更新</span>
         </span>
     
@@ -1028,9 +1028,10 @@
 <p>​	<code>^</code>匹配串的开始，因此<code>^[0-9\\.]</code>只在<code>.</code>或任意数字为串中第一个字符时才匹配它们</p>
 <p>​	没有<code>^</code>，则还要多检索那些中间有数字的行</p>
 <p><strong><code>^</code>的双重用途</strong>：<code>^</code>有两种用法</p>
-<pre><code>+ 在集合中(用`[`和`]`定义)，用它来否定该集合
-+ 否则，用来指串的开始处
-</code></pre>
+<ul>
+<li>在集合中(用<code>[</code>和<code>]</code>定义)，用它来否定该集合</li>
+<li>否则，用来指串的开始处</li>
+</ul>
 <p><strong>使REGEXP起类似LIKE的作用</strong>：前面说过，LIKE和REGEXP的不同在于：LIKE匹配整个串而REGEXP匹配子串</p>
 <p>​	利用定位符，通过用<code>^</code>开始每个表达式，用<code>$</code>结束每个表达式，可以使REGEXP的作用与LIKE一样</p>
 <p><strong>简单的正则表达式测试</strong>：可以在不使用数据库表的情况下用SELECT来测试正则表达式</p>
@@ -1054,7 +1055,7 @@
         
             <li>
                 <strong>更新于
-                    :</strong> 2024-10-22 16:36:23
+                    :</strong> 2024-10-22 16:39:45
             </li>
         
         <li>
