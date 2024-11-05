@@ -26,7 +26,7 @@
 <meta property="og:description" content="阅读MySQL必知必会做的笔记，看完忘了就不好了(">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2024-10-18T07:52:53.000Z">
-<meta property="article:modified_time" content="2024-11-04T04:33:37.488Z">
+<meta property="article:modified_time" content="2024-11-05T13:30:08.260Z">
 <meta property="article:author" content="GuangYing">
 <meta property="article:tag" content="笔记">
 <meta property="article:tag" content="MySQL">
@@ -419,8 +419,8 @@
     
         <span class="article-date article-meta-item">
             <i class="fa-regular fa-wrench"></i>&nbsp;
-            <span class="desktop">2024-11-04 12:33:37</span>
-            <span class="mobile">2024-11-04 12:33:37</span>
+            <span class="desktop">2024-11-05 21:30:08</span>
+            <span class="mobile">2024-11-05 21:30:08</span>
             <span class="hover-info">更新</span>
         </span>
     
@@ -2598,7 +2598,7 @@ WHERE子句限定了order_num的值
 <h1 id="使用游标"><a href="#使用游标" class="headerlink" title="使用游标"></a>使用游标</h1><p>什么是游标以及如何使用游标</p>
 <h2 id="游标"><a href="#游标" class="headerlink" title="游标"></a>游标</h2><p><strong>需要MySQL 5</strong>：MySQL 5添加了对游标的支持</p>
 <p>MySQL检索操作返回一组称为结果集的行<br>这组返回的行动是与SQL语句相匹配的行(0行或多行)<br>使用简单的SELECT语句，没法得到某些行，也不能在每次一行的处理所有行的简单方法(相对于成批的处理它们)</p>
-<p>使用游标的原因：有时需要在检索出来的行中前进或后退一行或多行<br><strong>游标</strong>“是一个存储在MySQL服务器上的数据库查询<br>    它不是一条SELECT语句，而是被该语句检索出来的结果集<br>在存储了游标之后，应用程序可以根据需要滚动或浏览其中的数据</p>
+<p>使用游标的原因：有时需要在检索出来的行中前进或后退一行或多行<br><strong>游标</strong>：是一个存储在MySQL服务器上的数据库查询<br>    它不是一条SELECT语句，而是被该语句检索出来的结果集<br>在存储了游标之后，应用程序可以根据需要滚动或浏览其中的数据</p>
 <p>游标主要用于交互式应用<br>其中用户需要滚动屏幕上的数据，并对数据进行浏览或做出更改</p>
 <p><strong>只能用于存储过程</strong>：不像多数DBMS，MySQL游标只能用于存储过程(和函数)</p>
 <h2 id="使用游标-1"><a href="#使用游标-1" class="headerlink" title="使用游标"></a>使用游标</h2><p>使用游标涉及几个明确的步骤：</p>
@@ -2630,15 +2630,11 @@ DECLARE语句用来定义和命名游标，这里为ordernumbers
 <p><strong>隐含关闭</strong>：如果不明确关闭游标，MySQL将会在到达END语句时自动关闭它</p>
 <p>下面是前面例子的修改版本：<br>输入：</p>
 <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">CREATE PROCEDURE processorders()</span><br><span class="line">BEGIN</span><br><span class="line">	-- 定义游标</span><br><span class="line">	DECLARE ordernumbers CURSOR</span><br><span class="line">	FOR</span><br><span class="line">	SELECT order_num FROM orders;</span><br><span class="line"></span><br><span class="line">	-- 打开游标</span><br><span class="line">	OPEN ordernumbers;</span><br><span class="line">	</span><br><span class="line">	-- 关闭游标</span><br><span class="line">	CLOSE ordernumbers;</span><br><span class="line"></span><br><span class="line">END;</span><br></pre></td></tr></table></figure></div>
-<pre><code>这个存储过程声明、打开和关闭一个游标
-但对检索出的数据什么也没做
-</code></pre>
+<p>​	这个存储过程声明、打开和关闭一个游标<br>​	但对检索出的数据什么也没做</p>
 <h3 id="使用游标数据"><a href="#使用游标数据" class="headerlink" title="使用游标数据"></a>使用游标数据</h3><p>在一个游标被打开后，可以使用FETCH语句分别访问它的每一行<br><strong>FETCH</strong>指定检索声明数据(所需的列)，检索出来的数据存储在什么地方<br>它还向前移动游标中的内部行指针，使下一条FETCH语句检索下一行(不重复读取同一行)</p>
 <p>例：从游标中检索单个行(第一行)：<br>输入：</p>
 <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">CREATR PROCEDUER processorders()</span><br><span class="line">BEGIN</span><br><span class="line">	</span><br><span class="line">	-- 声明局部变量</span><br><span class="line">	DECLARE o INT;</span><br><span class="line"></span><br><span class="line">	-- 定义游标</span><br><span class="line">	DECLARE ordernumbers CURSOR</span><br><span class="line">	FOR</span><br><span class="line">	SELECT order_num FROM orders;</span><br><span class="line"></span><br><span class="line">	-- 打开游标</span><br><span class="line">	OPEN ordernumbers</span><br><span class="line"></span><br><span class="line">	-- 获取ordernumbers</span><br><span class="line">	FETCH ordernumbers INTO o&#x27;</span><br><span class="line"></span><br><span class="line">	-- 关闭游标</span><br><span class="line">	CLOSE ordernumbers;</span><br><span class="line"></span><br><span class="line">END;</span><br></pre></td></tr></table></figure></div>
-<pre><code>`FETCH`用来检索当前行的order_num列(将自动从第一行开始)到一个名为o的局部声明的变量中
-对检索出的数据不做任何处理
-</code></pre>
+<p><code>FETCH</code>用来检索当前行的order_num列(将自动从第一行开始)到一个名为o的局部声明的变量中<br>    对检索出的数据不做任何处理</p>
 <p>下例：循环检索数据，从第一行到最后一行：<br>输入：</p>
 <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">CREATE PROCEDURE processorders()</span><br><span class="line">BEGIN</span><br><span class="line">	-- 声明局部变量</span><br><span class="line">	DECLARE done BOOLEAN DEFAULT 0;</span><br><span class="line">	DECLARE o INT;</span><br><span class="line"></span><br><span class="line">	-- 定义游标</span><br><span class="line">	DECLARE ordernumbers CURSOR</span><br><span class="line">	FOR</span><br><span class="line">	SELECT order_num FROM orders;</span><br><span class="line"></span><br><span class="line">	-- 声明 continue 处理程序</span><br><span class="line">	DECLARE CONTINUE HANDLER FOR SQLSTATE &#x27;02000&#x27; SET done=1;</span><br><span class="line"></span><br><span class="line">	-- 打开游标</span><br><span class="line">	OPEN ordernumbers;</span><br><span class="line"></span><br><span class="line">	-- 循环遍历所有行</span><br><span class="line">	REPEAT</span><br><span class="line"></span><br><span class="line">		-- 获取ordernumbers</span><br><span class="line">		FETCH ordernumbers INTO o;</span><br><span class="line"></span><br><span class="line">	-- 循环结束</span><br><span class="line">	UNTIL done END REPEAT;</span><br><span class="line"></span><br><span class="line">	-- 关闭游标</span><br><span class="line">	CLOSE ordernumbers;</span><br><span class="line"></span><br><span class="line">END;</span><br></pre></td></tr></table></figure></div>
 <p>使用FETCH检索当前order_num到声明的名为o的变量中<br>与前一个例子不同的是，这个例子中的FETCH是在REPEAT内</p>
@@ -2649,7 +2645,7 @@ DECLARE语句用来定义和命名游标，这里为ordernumbers
 <p>那么，done怎样才能在结束时被设置为真？<br>使用以下语句：</p>
 <div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DECLART CONTINUE HANDLER FOR SQLSTARTE ’02000‘ SET done=1;</span><br></pre></td></tr></table></figure></div>
 <ul>
-<li>此语句定义了一个<code>CONTINUE HANDLER</code><br>  是在条件出现时被执行的代码</li>
+<li>此语句定义了一个<code>CONTINUE HANDLER</code>(条件句柄)<br>  是在条件出现时被执行的代码</li>
 <li>它指出当<code>SQLSTATE &#39;02000&#39;</code>出现时，<code>SET done=1</code></li>
 <li><code>SQLSTATE &#39;02000&#39;</code>是一个未找到条件<br>  当REPERAT由于没有更多的行供循环而不能继续时，出现这个条件</li>
 </ul>
@@ -2677,6 +2673,717 @@ DECLARE语句用来定义和命名游标，这里为ordernumbers
 
 <p>这样就得到了存储过程、游标、逐行处理以及存储过程条用其他存储过程的一个完整的工作样例</p>
 <hr>
+<h1 id="使用触发器"><a href="#使用触发器" class="headerlink" title="使用触发器"></a>使用触发器</h1><h2 id="触发器"><a href="#触发器" class="headerlink" title="触发器"></a>触发器</h2><p><strong>需要MySQL 5</strong></p>
+<p>MySQL在需要时被执行，存储过程也是如此</p>
+<p>如果想要某条语句(或某些语句)在事件发生时自动执行呢</p>
+<p>例：在某个表发生更改时自动处理，使用触发器</p>
+<p><strong>触发器</strong>：是MySQL相应以下任意语句而自动执行的一条MySQL语句</p>
+<p>​	(或位于<code>BEGIN</code>和<code>END</code>语句之间的一组语句)</p>
+<ul>
+<li><code>DELETE</code></li>
+<li><code>INSERT</code></li>
+<li><code>UPDATE</code></li>
+</ul>
+<p>其他MySQL语句不支持触发器</p>
+<h2 id="创建触发器"><a href="#创建触发器" class="headerlink" title="创建触发器"></a>创建触发器</h2><p>在创建触发器时，需要给出4条信息：</p>
+<ul>
+<li>唯一的触发器名</li>
+<li>触发器关联的表</li>
+<li>触发器应该相应的活动(DELETE、INSERT或UPDATE)</li>
+<li>触发器何时执行(处理之前或之后)</li>
+</ul>
+<p><strong>保持每个数据库的触发器名唯一</strong>：在MySQL5中，触发器名必须在每个表中唯一，但不是在每个数据库中唯一</p>
+<p>​	在其他每个数据库触发器名必须唯一的DBMS中是不允许的，而且未来MySQL版本可能会使命名规则更为严格</p>
+<p>​	因此，最好在数据库范围内使用唯一的触发器名</p>
+<p>触发器用<code>CREATE TRIGGER</code>语句创建：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CREATE TRIGGER newproduct AFTER INSERT ON products</span><br><span class="line">FOR EACH ROW SELECT &#x27;Product added&#x27;;</span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li><code>CREATE TRIGGER</code>用来创建名为newproduct的新触发器</li>
+<li>触发器可在一个操作发生之前或之后执行<ul>
+<li>此处给出<code>AFTER INSERT</code>，所以此触发器将在INSERT语句成功执行后执行</li>
+</ul>
+</li>
+<li>这个触发器还指定<code>FOR EACH ROW</code><ul>
+<li>因此代码对每个插入行执行</li>
+</ul>
+</li>
+</ul>
+<p>此例中，文本<code>Product added</code>将对每个插入的行显示一次</p>
+<p><strong>仅支持表</strong>：只有表才支持触发器，视图不支持(临时表也不支持)</p>
+<p>触发器按每个表每个事件每次的定义</p>
+<p>​	每个表每个事件每次只允许一个触发器</p>
+<p>因此每个表最多支持6个触发器(每条<code>INSERT</code>、<code>UPDATE</code>和<code>DELETE</code>的之前和之后)</p>
+<p>单一触发器不能与多个事件或多个表关联</p>
+<p>​	所以如果需要对一个INSERT和UPDARE操作执行的触发器，则应该定义两个触发器</p>
+<p><strong>触发器失败</strong>：如果BEFORE触发器失败，则MySQL将不执行请求的操作</p>
+<p>​	此外没如果BEFORE触发器或语句本身失败，MySQL将不执行AFTER触发器(如果有的话)</p>
+<h2 id="删除触发器"><a href="#删除触发器" class="headerlink" title="删除触发器"></a>删除触发器</h2><p>为删除一个触发器，可使用<code>DROP TRIGGER</code>语句：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DROP TRIGGER newproduct;</span><br></pre></td></tr></table></figure></div>
+
+<p>​	触发器不能更新或覆盖</p>
+<p>为了修改一个触发器，必须先删除它，然后再重新创建</p>
+<h2 id="使用触发器-1"><a href="#使用触发器-1" class="headerlink" title="使用触发器"></a>使用触发器</h2><p>所支持的每种触发器类型以及它们的差别</p>
+<h3 id="INSERT触发器"><a href="#INSERT触发器" class="headerlink" title="INSERT触发器"></a>INSERT触发器</h3><p>在INSERT语句执行之前或之后执行</p>
+<p>需要知道以下几点：</p>
+<ul>
+<li>在<code>INSERT</code>触发器代码内，可引用一个名为<code>NEW</code>的虚拟表，访问被插入的行</li>
+<li>在<code>BEFORE INSERT</code>触发器中，<code>NEW</code>中的值也可以被更新(允许更改被插入的值)</li>
+<li>对于<code>AUTO_INCREMENT</code>列，<code>NEW</code>在<code>INSERT</code>执行之前包含0，在<code>INSERT</code>执行之后包含新的自动生成值</li>
+</ul>
+<p>例：<code>AUTO_INCREMENT</code>列具有MySQL自动赋予的值</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CREATE TRIGGER neworder AFTER INSERT ON orders</span><br><span class="line">FOR EACH ROW SELECT NEW,order_num;</span><br></pre></td></tr></table></figure></div>
+
+<p>但这是一种确定新生成的值的更好的方法</p>
+<p><strong>DEFORE或AFTER？</strong>：通常，将BEFORE用于数据验证和净化(目的是保证插入表中的数据确实是需要的数据)</p>
+<p>​	本提示也适用于UPDATE触发器</p>
+<h3 id="DELETE触发器"><a href="#DELETE触发器" class="headerlink" title="DELETE触发器"></a>DELETE触发器</h3><p>在DELETE语句执行之前或之后执行</p>
+<p>需要知道以下两点：</p>
+<ul>
+<li>在DELETE触发器代码内，可以引用一个名为OLD的虚拟表，访问被删除的行</li>
+<li>OLD中的值全部都是只读的，不能更新</li>
+</ul>
+<p>例：使用OLD保存将要被删除的行到一个存档表中</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">CREATE TRIGGER deleteorder BEFORE DELETE ON orders</span><br><span class="line">FOR EACH ROW</span><br><span class="line">BEGIN</span><br><span class="line">	INSERT INTO archive_orders(order_num, order_date, cust_id)</span><br><span class="line">	VALUES(OLD.order_num, OLD.order_date, OLD.cust_id);</span><br><span class="line">END;</span><br></pre></td></tr></table></figure></div>
+
+
+
+<p>使用<code>BEFORE DELETE</code>触发器的优点(相对于<code>AFTER DELETE</code>触发器来说)为：如果由于某种原因，订单不能存档，DELETE本身将被放弃</p>
+<p><strong>多语句触发器</strong>：触发器deleteorder使用<code>BEGIN</code>和<code>END</code>语句标记触发器体</p>
+<p>​	这并不是必须的，但也没有害处</p>
+<p>​	使用<code>BEGIN END</code>块的好处是触发器能容纳多条SQL语句(在<code>BEGIN END</code>块中一条挨着一条)</p>
+<h3 id="UPDATE触发器"><a href="#UPDATE触发器" class="headerlink" title="UPDATE触发器"></a>UPDATE触发器</h3><p>在UPDATE语句执行之前或之后执行</p>
+<p>需要知道以下几点：</p>
+<ul>
+<li>在UPDATE触发器代码中<ul>
+<li>可以引用一个名为OLD的虚拟表访问以前(UPDATE语句前)的值</li>
+<li>引用一个名为NEW的虚拟表访问新更新的值</li>
+</ul>
+</li>
+<li>在<code>BEFORE UPDATE</code>触发器中，NEW中的值可能也被更新(允许更改将要用于UPDATE语句中的值)</li>
+<li>OLD中的值全都是只读的，不能更新</li>
+</ul>
+<p>例：保证州名缩写总是大写(不管UPDATE语句中给出的是大写还是小写)</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CREATE TRIGGER updatevendor BEFORE UPDATE ON vendors</span><br><span class="line">FOR EACH ROW SET NEW,vend_state = Upper(NEW.vend_state);</span><br></pre></td></tr></table></figure></div>
+
+<p>显然，任何数据净化都需要再UPDATE语句之前进行，就像此例中一样</p>
+<p>​	每次更新一个值时，<code>NEW.vend_state</code>中的值(将用来更新表行的值)都用<code>Upper(NEW.vend_state)</code>替换</p>
+<h3 id="关于触发器的进一步介绍"><a href="#关于触发器的进一步介绍" class="headerlink" title="关于触发器的进一步介绍"></a>关于触发器的进一步介绍</h3><p>一些使用触发器时需要记住的重点：</p>
+<ul>
+<li>与其他DBMS相比，MySQL 5中支持的触发器相当初级<ul>
+<li>未来的MySQL版本中有一些改进和增强触发器支持的计划</li>
+</ul>
+</li>
+<li>创建触发器可能需要特殊的安全访问权限，但是，触发器的执行是自动的<ul>
+<li>如果<code>INSERT</code>、<code>UPDATE</code>、<code>DELETE</code>语句能够执行，则相关的触发器也能执行</li>
+</ul>
+</li>
+<li>应该用触发器来保证数据的一致性(大小写、格式等)<ul>
+<li>在触发器中执行这种类型的处理的优点是：它总是进行这种处理，而且是透明的进行，与客户机应用无关</li>
+</ul>
+</li>
+<li>触发器的一种非常有意义的使用是：创建审计跟踪<ul>
+<li>使用触发器，把更改(如果需要，甚至还有之前和之后的状态)记录到另一个表非常容易</li>
+</ul>
+</li>
+<li>遗憾的是，MySQL触发器中不支持CALL语句<ul>
+<li>这表示不能从触发器内调用存储过程</li>
+<li>所需的存储过程代码需要复制到触发器内</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h1 id="管理事务处理"><a href="#管理事务处理" class="headerlink" title="管理事务处理"></a>管理事务处理</h1><p>什么是事务处理 以及 如何利用<code>COMMIT</code>和<code>ROLLBACK</code>语句来管理事务处理</p>
+<h2 id="事务处理"><a href="#事务处理" class="headerlink" title="事务处理"></a>事务处理</h2><p><strong>并非所有引擎都支持事务处理</strong>：MySQL支持几种基本的数据库引擎</p>
+<p>​	并非所有引擎都支持明确的事务处理管理</p>
+<p>MyISAM和InnoDB是两种最常使用的引擎</p>
+<ul>
+<li>前者不支持明确的事务处理管理，而后者支持</li>
+</ul>
+<p>如果应用中需要事务处理功能，则一定要使用正确的引擎类型</p>
+<p><strong>事务处理</strong>可以用来维护数据库的完整性，它保证成批的MySQL操作要么完全执行，要么完全不执行</p>
+<p>关系数据库设计吧数据鵆在多个表中，使数据更容易操纵、维护和重用</p>
+<p>​	在某种程度上说，设计良好的数据库模式都是关联的</p>
+<p>事务处理是一种机制，用来管理必须成批执行的MySQL操作，以保证数据库不包含不完整的操作结果</p>
+<p>利用事务处理，可以保证一组操作不会中途停止，它们或者作为整体执行，或者完全不执行(除非明确指示)</p>
+<p>如果没有错误发生，整组语句提交给(写到)数据库表</p>
+<p>如果发生错误，则进行回退(撤销)以恢复数据库到某个已知且安全的状态</p>
+<p>在使用事务和事务处理时，有几个关键词汇反复出现</p>
+<p>下面是关于事务处理需要知道的几个术语：</p>
+<ul>
+<li><strong>事务</strong>：指一组SQL语句</li>
+<li><strong>回退</strong>：指撤销指定SQL语句的过程</li>
+<li><strong>提交</strong>：指将未存储的SQL语句结果写入数据库表</li>
+<li><strong>保留点</strong>：指事务处理中设置的临时占位符，可对它发布回退(与回退整个事务处理不同)</li>
+</ul>
+<h2 id="控制事务处理"><a href="#控制事务处理" class="headerlink" title="控制事务处理"></a>控制事务处理</h2><p>管理事务处理的关键在于：将SQL语句组分解为逻辑块，并明确规定数据何时应该回退，何时不应该回退</p>
+<p>MySQL使用下面的语句来标识事务的开始：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">START TRANSACTION</span><br></pre></td></tr></table></figure></div>
+
+
+
+<h3 id="使用ROLLBACK"><a href="#使用ROLLBACK" class="headerlink" title="使用ROLLBACK"></a>使用ROLLBACK</h3><p>MySQL的ROOLBACK命令用来回退(撤销)MySQL语句</p>
+<p>例：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM ordertotals;</span><br><span class="line">START TRANSACTION;</span><br><span class="line">DELETE FROM ordertotals;</span><br><span class="line">SELECT * FROM ordertotals;</span><br><span class="line">ROOLBACK;</span><br><span class="line">SELECT * FROM ordertotals;</span><br></pre></td></tr></table></figure></div>
+
+<ul>
+<li>首先执行一条SELECT以显示该表不为空</li>
+<li>然后开始一个事务处理<ul>
+<li>用一条DELETE语句删除ordertotals中的所有行</li>
+<li>另一条SELECT语句验证ordertotals确实为空</li>
+<li>这时用一条ROLLBACK语句回退<code>START TRANSACTION</code>之后的所有语句</li>
+</ul>
+</li>
+<li>最后一条SELECT语句显示该表不为空</li>
+</ul>
+<p>显然，ROLLBACK只能在一个事务处理内使用(在执行一条<code>START TRANSACTION</code>命令之后)</p>
+<p><strong>哪些语句可以回退？</strong>：事务处理用来管理<code>INSERT</code>、<code>UPDATE</code>、<code>DELETE</code>语句</p>
+<ul>
+<li><p>不能回退SELECT语句(这样做也没有什么意义)</p>
+</li>
+<li><p>不能回退CREATE或DROP操作</p>
+<ul>
+<li>事务处理块中可以使用这两条语句，但如果你执行回退，它们不会被撤销</li>
+</ul>
+</li>
+</ul>
+<h3 id="使用COMMIT"><a href="#使用COMMIT" class="headerlink" title="使用COMMIT"></a>使用COMMIT</h3><p>一般的MySQL语句都是直接针对数据库表执行和编写的</p>
+<p>​	这就是所谓的<strong>隐含提交</strong>：即提交(写或保存)操作是自动进行的</p>
+<p>但，在事务处理块中，提交不会隐含的进行</p>
+<p>为进行明确的提交，使用COMMIT语句，如下所示：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">START TRANSACTION;</span><br><span class="line">DELETE FROM orderitems WHERE order_num = 20010;</span><br><span class="line">DELETE FROM orders WHERE order_num = 20010;</span><br><span class="line">COMMIT;</span><br></pre></td></tr></table></figure></div>
+
+<p>最后的COMMIT语句不仅在不出错时写出更改</p>
+<p>如果第一条DELETE起作用，但第二条失败，则DELETE不会提交(实际上，它是被自动撤销的)</p>
+<p><strong>隐含事务关闭</strong>：当COMMIT或ROLLBACK语句执行后，事务会自动关闭(将来的更改会隐含提交)</p>
+<h3 id="使用保留点"><a href="#使用保留点" class="headerlink" title="使用保留点"></a>使用保留点</h3><p>简单的ROLLBACK和COMMIT语句就可以写入或撤销整个事务处理</p>
+<p>​	但，只是对简单的事务处理才能这样做，更复杂的事务处理可能需要部分提交或回退</p>
+<p>为了支持回退部分事务处理，必须能在事务处理块中合适的位置放置占位符</p>
+<p>​	这样，如果需要回退，可以回退到某个占位符</p>
+<p>这些占位符称为保留点</p>
+<p>为了创建占位符，可使用SAVEPOINT语句：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SAVEPOINT delete1;</span><br></pre></td></tr></table></figure></div>
+
+<p>每个保留点都取标志它的唯一名字，以便在回退时，MySQL知道要回退到何处</p>
+<p>为了回退到本例给出的保留点，可如下进行：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ROLLBACK TO delete1;</span><br></pre></td></tr></table></figure></div>
+
+
+
+<p><strong>保留点越多越好</strong>：可以在MySQL代码中设置任意多的保留点，越多越好</p>
+<p>​	为什么：因为保留点越多，就越能按自己的意愿灵活的进行回退</p>
+<p><strong>释放保留点</strong>：保留点在事务处理完成(执行一条ROLLBACK或COMMIT)后自动释放</p>
+<p>​	自MySQL5以来，也可以用<code>RELEASE SAVEPOINT</code>明确的释放保留点</p>
+<h3 id="更改默认的提交行为"><a href="#更改默认的提交行为" class="headerlink" title="更改默认的提交行为"></a>更改默认的提交行为</h3><p>默认的MySQL行为是自动提交所有更改</p>
+<p>换句话说，任何时候执行一条MySQL语句，该语句实际上都是针对表执行的，而且所做的更改立即生效</p>
+<p>为指示MySQL不自动提交更改，需要使用以下语句：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SET autocommit=0;</span><br></pre></td></tr></table></figure></div>
+
+<p>autocommit标志决定是否自动提交更改，不管有没有COMMIT语句</p>
+<p>​	设置autocommit为0(假)指示MySQL不自动提交更改(直到autcommit被设置为真为止)</p>
+<p><strong>标志为连接专用</strong>：autocommit标志是针对每个连接而不是服务器的</p>
+<hr>
+<h1 id="全球化和本地化"><a href="#全球化和本地化" class="headerlink" title="全球化和本地化"></a>全球化和本地化</h1><p>MySQL处理不同字符集和语言的基础知识</p>
+<h2 id="字符集和校对顺序"><a href="#字符集和校对顺序" class="headerlink" title="字符集和校对顺序"></a>字符集和校对顺序</h2><p>数据库表被用来存储和检索数据，不同的语言和字符集需要以不同的方式存储和检索</p>
+<p>​	因此，MySQL需要适应不同的字符集（不同的字母和字符），适应不同的排序和检索数据的方法</p>
+<p>在讨论多种语言和字符集时，将会遇到以下重要术语：</p>
+<ul>
+<li><p><strong>字符集</strong>：为字母和符号的集合</p>
+</li>
+<li><p><strong>编码</strong>：为某个字符集成员的内部表示</p>
+</li>
+<li><p><strong>校对</strong>：为规定字符如何比较的指令</p>
+</li>
+</ul>
+<p><strong>校对为什么重要</strong>：大小写的区分不仅影响排序(如用<code>ORDER BY</code>排序数据)，还影响搜索(如<code>WHERE</code>)</p>
+<p>​	在使用法文或德文等字符时更复杂，在使用不基于拉丁文的字符集时，情况更为复杂</p>
+<p>在MySQL的正常数据库活动(SELECT、INSERT等)中，不需要操心太多东西</p>
+<p>使用何种字符集和校对的决定在服务器、数据库和表级进行</p>
+<h2 id="使用字符集和校对顺序"><a href="#使用字符集和校对顺序" class="headerlink" title="使用字符集和校对顺序"></a>使用字符集和校对顺序</h2><p>MySQL支持众多的字符集</p>
+<p>为查看所支持的字符集完整列表，使用以下语句：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SHOW CHARACTER SET;</span><br></pre></td></tr></table></figure></div>
+
+<p>这条语句显示所有可用的字符集以及每个字符集的描述和默认校对</p>
+<p>为查看所支持校对的完整列表，使用以下语句：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SHOW COLLATION;</span><br></pre></td></tr></table></figure></div>
+
+<p>显式所有可用的校对，以及它们适用的字符集</p>
+<p>​	可以看到有的字符集具有不止一种校对，而且许多校对出现两次，一次区分大小写(<code>_cs</code>)，一次不区分大小写(<code>_ci</code>)</p>
+<p>通常系统管理在安装时定义一个默认的字符集和校对</p>
+<p>此外，也可以在创建数据库时，指定默认的字符集和校对</p>
+<p>为了确定所用的字符集和校对，可以使用以下语句：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SHOW VARIABLES LIKE &#x27;character%&#x27;;</span><br><span class="line">SHOW VARIABLES LIKE &#x27;collation%&#x27;;</span><br></pre></td></tr></table></figure></div>
+
+<p>实际上，字符集很少是服务器范围(甚至数据库范围)的设置</p>
+<p>​	不同的表，甚至不同的列都可能需要不同的字符集，而且两者都是可以在创建表时指定</p>
+<p>为了给表指定字符集和校对，可使用带子句的<code>CREATE TABLE</code>：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE mytable</span><br><span class="line">(</span><br><span class="line">	columnn1	INT,</span><br><span class="line">	columnn2	VARCHAR(10)</span><br><span class="line">) DEFAULT CHARACTER SET hebrew</span><br><span class="line">  COLLATE hebrew_general_ci;</span><br></pre></td></tr></table></figure></div>
+
+<p>这个例子中指定了<code>CHARACTER SET</code>和<code>COLLATE</code>两者</p>
+<p>一般MySQL如下确定使用什么样的字符集和校对：</p>
+<ul>
+<li>如果指定<code>CHARACTER SET</code>和<code>COLLATE</code>两者，则使用这些值</li>
+<li>如果只指定<code>CHARACTER SET</code>，则使用此字符集及其默认的校对(如<code>SHOW CHARACTER SET</code>的结果中所示)</li>
+<li>如果即不指定<code>CHARACTER SET</code>，也不指定<code>COLLATE</code>，则使用数据库默认</li>
+</ul>
+<p>除了能指定字符集和校对的表范围外，MySQL还允许对每个列设置它们，如下所示：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">CREATE TABLE mytable</span><br><span class="line">(</span><br><span class="line">	columnn1	INT</span><br><span class="line">	colummn2	VARCHAR(10)</span><br><span class="line">	columnn3	VARCHAR(10) CHARACTER SET latin1 COLLATE latin1_general_ci</span><br><span class="line">) DEFAULT CHARACTER SET hebrew</span><br><span class="line">  COLLATE hebrew_general_ci;</span><br></pre></td></tr></table></figure></div>
+
+<p>这里对整个表以及一个特定的列指定了CHARACTER SET和COLLATE</p>
+<p>校对在对用<code>ORDER BY</code>子句检索出来的数据排序时起重要的作用</p>
+<p>如果需要用于创建表时不同的校对顺序排序特定的SELECT语句，可以在SELECT语句自身中进行：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SELECT * FROM customers</span><br><span class="line">ORDER BY lastname, firstname COLLATE latin1_general_cs;</span><br></pre></td></tr></table></figure></div>
+
+<p>此SELECT使用COLLATE指定一个备用的校对顺序(此例中为区分大小写的校对)</p>
+<p>​	这显然将会影响到结果排序的次序</p>
+<p><strong>临时区分大小写</strong>：上面的SELECT语句演示了在通常不区分大小写的表上进行区分大小写搜索的一种技术</p>
+<p>​	当然，反过来也是可以的</p>
+<p><strong>SELECT的其他COLLATE子句</strong>：除了这里看到的在<code>ORDER BY</code>子句中使用以外，COLLATE还可以用于<code>GROUP BY</code>、<code>HAVING</code>、聚集函数、别名等</p>
+<p>最后，值得注意点是，如果绝对需要，穿可以在字符集之间进行转换</p>
+<p>​	为此，使用<code>Cast()</code>或<code>Convert()</code>函数</p>
+<hr>
+<h1 id="安全管理"><a href="#安全管理" class="headerlink" title="安全管理"></a>安全管理</h1><p>数据库服务器通常包含关键的数据，确保这些数据的安全和完整需要利用访问控制</p>
+<h2 id="访问控制"><a href="#访问控制" class="headerlink" title="访问控制"></a>访问控制</h2><p>MySQL服务器的安全基础时：用户应该对他们需要的数据具有适当的访问权，既不能多也不能少</p>
+<p>​	即，用户不能对过多的数据具有过多的访问权</p>
+<p>   <strong>访问控制</strong>：管理访问控制需要创建和管理用户账号</p>
+<p>在现实世界的日常工作中，决不能使用root</p>
+<p>​	应该创建一系列的账号，有的用于管理，有的供用户使用，有的供开发人员使用，等等</p>
+<p><strong>防止无意的错误</strong>：重要的是注意到，访问控制的目的不仅仅是防止用户的恶意企图</p>
+<p>​	数据梦魇更为常见的是无意识错误的结果，如打错MySQL语句，在不适合的数据库中操作或其他一些用户错误</p>
+<p>​	通过保证用户不能执行他们不应该执行的语句，访问控制有助于避免这些情况的发生</p>
+<p><strong>不要使用root</strong>：应该严肃对待root登录的使用</p>
+<p>​	仅在绝对需要时使用它(或许在你不能登录其他管理账号时使用)</p>
+<p>​	不应该在日常的MySQL操作中使用root</p>
+<h2 id="管理用户"><a href="#管理用户" class="headerlink" title="管理用户"></a>管理用户</h2><p>MySQL用户账号和信息存储在名为mysql的MySQL数据库中</p>
+<p>一般不需要直接访问mysql数据库和表，但有时需要直接访问</p>
+<p>需要直接访问它的时机之一是在需要获得多于用户账号列表时</p>
+<p>​	为此，可使用以下代码：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">USE mySql;</span><br><span class="line">SELECT user FROM user;</span><br></pre></td></tr></table></figure></div>
+
+<p>mysql数据库有一个名为user的表，它包含所有用户账号</p>
+<p>user表有一个名为user的列，它存储用户登录名</p>
+<p><strong>用多个客户机进行试验</strong>：试验对用户账号和权限进行更改的最好办法是打开多个数据库客户机(如mysql命令行使用程序的多个副本)，一个作为管理登录，其他作为被测试的用户登录</p>
+<h3 id="创建用户账号"><a href="#创建用户账号" class="headerlink" title="创建用户账号"></a>创建用户账号</h3><p>为了创建一个新用户账号，使用<code>CREATE USER</code>语句，如下所示：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CREATE USER ben IDENTIFIED BY &#x27;p@$$w0rd&#x27;;</span><br></pre></td></tr></table></figure></div>
+
+<p><code>CREATE USER</code>创建一个新用户账号</p>
+<p>在创建用户账号时不一定需要口令，不过这个例子用<code>IDENTIFIED BY &#39;p@$$w0rd&#39;</code>给出了一个口令</p>
+<p>​	如果再次列出用户账号，将会在输出中看到新账号</p>
+<p><strong>指定散列口令</strong>：<code>IDENTIDIED BY</code>指定的口令为纯文本</p>
+<p>​	MySQL将在保存到user表之前对其进行加密</p>
+<p>为了作为散列值指定口令，使用<code>IDENTIDIED BY PASSWORD</code></p>
+<p><strong>使用GRANT或INSERT</strong>：</p>
+<p>​	GRANT语句也可以创建用户账号，但一般来说<code>CREATE USER</code>是最清楚和最简单的句子</p>
+<p>此外，也可以通过直接插入行到user表来增加用户，不过为安全起见，一般不建议这样做</p>
+<p>MySQL用来存储用户账号信息的表(以及表模式等)极为重要，对它们的任何毁坏都可能严重的伤害到MySQL服务器</p>
+<p>​	因此，相对于直接处理来说，最好是用标记和函数来处理这些表</p>
+<p>为重新命名一个用户账号，使用<code>RENAME USER</code>语句，如下所示：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">RENAME USER ben TO bforta;</span><br></pre></td></tr></table></figure></div>
+
+<p><strong>MySQL 5之前</strong>：仅MySQL5或之后的版本支持<code>RENAME USER</code></p>
+<p>​	为了在以前的MySQL中重命名一个用户，可使用<code>UPDATE</code>直接更新user表</p>
+<h3 id="删除用户账号"><a href="#删除用户账号" class="headerlink" title="删除用户账号"></a>删除用户账号</h3><p>为了删除一个用户账号(以及相关的权限)，使用<code>DROP USER</code>语句，如下所示：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">DROP USER bforta;</span><br></pre></td></tr></table></figure></div>
+
+<p><strong>MySQL 5之前</strong>：</p>
+<p>​	自MySQL5以来，<code>DROP USER</code>删除用户账号和所有相关的账号权限</p>
+<p>​	在MySQL5以前，<code>DROP USER</code>只能用来删除用户账号，不能删除相关的权限</p>
+<p>因此如果使用旧版本的MySQL，需要先用<code>REVOKE</code>删除与账号相关的权限，然后再用<code>DROP USER</code>删除账号</p>
+<h3 id="设置访问权限"><a href="#设置访问权限" class="headerlink" title="设置访问权限"></a>设置访问权限</h3><p>在创建用户账号后，必须接着分配访问权限</p>
+<p>新创建的用户账号没有访问权限</p>
+<p>​	它们能登录MySQL，但不能看到数据，不能执行任何数据库操作</p>
+<p>为看到赋予用户账号的权限，使用<code>SHOW GRANTS FOR</code>，如下所示：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SHOW GRANTS FOR bforta;</span><br></pre></td></tr></table></figure></div>
+
+<p>输出结果显示bforta有一个权限<code>USAGE ON *.*</code></p>
+<ul>
+<li>USAGE表示根本没有权限(很不直观罢)</li>
+</ul>
+<p>所以此结果教室在任意数据库和任意表上对任何东西都没有权限</p>
+<p>**用户定义为<code>user@host</code>**：MySQL的权限用用户名和主机名结合定义</p>
+<p>​	如果不指定主机名，则使用默认的主机名<code>%</code>(授予用户访问权限而不管主机名)</p>
+<p>为设置权限，使用GRANT语句</p>
+<p>GRANT要求至少给出以下信息：</p>
+<ul>
+<li>要授予的权限</li>
+<li>被授予访问权限的数据库或表</li>
+<li>用户名</li>
+</ul>
+<p>下例给出GRANT的用法：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GRANT SELECT ON crashcourse.* TO bforta;</span><br></pre></td></tr></table></figure></div>
+
+<p>此GRANT允许用户在<code>crashcourse.*</code>(crashcourse数据库的所有表)上使用SELECT</p>
+<p>​	通过只授予SELECT访问权限，用户bforta对crashcourse数据库中的所有数据具有只读访问权限</p>
+<p><code>SHOW GRANTS</code>反映这个更改：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SHOW GRANTS FOR bforta;</span><br></pre></td></tr></table></figure></div>
+
+<p>每个GRANT添加(或更新)用户的一个权限</p>
+<p>​	MySQL读取所有授权，并根据它们确定权限</p>
+<p>GRANT的反操作为REVOKE，用它来撤销特定的权限：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">REVOKE SELECT ON crashcourse.* FROM bforta;</span><br></pre></td></tr></table></figure></div>
+
+<p>​	这条REVOKE语句取消刚刚赋予用户bforta的SELECT访问权限</p>
+<p>被撤销的访问权限必须存在，否则会出错</p>
+<p><code>GRANT</code>和<code>REVOKE</code>可在几个层次上控制访问权限：</p>
+<ul>
+<li>整个服务器，使用<code>GRANT ALL</code>和<code>REVOKE ALL</code></li>
+<li>整个数据库，使用<code>ON database.*</code></li>
+<li>特定的表，使用<code>ON database.table</code></li>
+<li>特定的列</li>
+<li>特定的存储过程</li>
+</ul>
+<p>下表列出可以授予或撤销的每个权限：</p>
+<p>表 权限</p>
+<table>
+<thead>
+<tr>
+<th>权限</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>ALL</code></td>
+<td>除<code>GRANT OPTION</code>外的所有权限</td>
+</tr>
+<tr>
+<td><code>ALTER</code></td>
+<td>使用<code>ALTER TABLE</code></td>
+</tr>
+<tr>
+<td><code>ALTER ROUTINE</code></td>
+<td>使用<code>ALTER PROCEDURE</code>和<code>DROP PROCEDURE</code></td>
+</tr>
+<tr>
+<td><code>CREATE</code></td>
+<td>使用<code>CREATE TABLE</code></td>
+</tr>
+<tr>
+<td><code>CREATE ROUTINE</code></td>
+<td>使用<code>CREATE PROCEDURE</code></td>
+</tr>
+<tr>
+<td><code>CREATE TEMPORARY TABLES</code></td>
+<td>使用<code>CREATE TEMPORARY TABLE</code></td>
+</tr>
+<tr>
+<td><code>CREATE USER</code></td>
+<td>使用<code>CREATE USER</code>、<code>DROP USER</code>、<code>RENAME USER</code>和<code>REVOKE ALL PRIVILEGES</code></td>
+</tr>
+<tr>
+<td><code>CREATE VIEW</code></td>
+<td>使用<code>CREATE VIEW</code></td>
+</tr>
+<tr>
+<td><code>DELETE</code></td>
+<td>使用<code>DELETE</code></td>
+</tr>
+<tr>
+<td><code>DROP</code></td>
+<td>使用<code>DROP TABLE</code></td>
+</tr>
+<tr>
+<td><code>EXECUTE</code></td>
+<td>使用<code>CALL</code>和存储过程</td>
+</tr>
+<tr>
+<td><code>FILE</code></td>
+<td>使用<code>SELECT INTO OUTFILE</code>和<code>LOAD DATA INFILE</code></td>
+</tr>
+<tr>
+<td><code>GRANT OPTION</code></td>
+<td>使用<code>CREATE INDEX</code>和<code>DROP INDEX</code></td>
+</tr>
+<tr>
+<td><code>INDEX</code></td>
+<td>使用<code>CREATE INDEX</code>和<code>DROP INDEX</code></td>
+</tr>
+<tr>
+<td><code>INSERT</code></td>
+<td>使用<code>INSERT</code></td>
+</tr>
+<tr>
+<td><code>LOCK TABLES</code></td>
+<td>使用<code>LOCK TABLES</code></td>
+</tr>
+<tr>
+<td><code>PROCESS</code></td>
+<td>使用<code>SHOW FULL PROCESSLIST</code></td>
+</tr>
+<tr>
+<td><code>RELOAD</code></td>
+<td>使用<code>FLUSH</code></td>
+</tr>
+<tr>
+<td><code>REPLICATION CLIENT</code></td>
+<td>服务器位置的访问</td>
+</tr>
+<tr>
+<td><code>REPLICATION SLAVE</code></td>
+<td>由复制从属使用</td>
+</tr>
+<tr>
+<td><code>SELECT</code></td>
+<td>使用<code>SELECT</code></td>
+</tr>
+<tr>
+<td><code>SHOW DATABASES</code></td>
+<td>使用<code>SHOW DATABASES</code></td>
+</tr>
+<tr>
+<td><code>SHOW VIEW</code></td>
+<td>使用<code>SHOW CREATE VIEW</code></td>
+</tr>
+<tr>
+<td><code>SHUTDOWN</code></td>
+<td>使用mysqladmin shutdown（用来关闭MySQL）</td>
+</tr>
+<tr>
+<td><code>SUPER</code></td>
+<td>使用<code>CHANGE MASTER</code>、<code>KILL</code>、<code>LOGS</code>、<code>PURGE</code>、<code>MASTER</code>和<code>SET GLOBAL</code>，还允许mysqladmin调试登录</td>
+</tr>
+<tr>
+<td><code>UPDATE</code></td>
+<td>使用<code>UPDATE</code></td>
+</tr>
+<tr>
+<td><code>USAGE</code></td>
+<td>无访问权限</td>
+</tr>
+</tbody></table>
+<p>使用GRANT和REVOKE，在结合表中列出的权限，就能对用户具有完全的控制</p>
+<p><strong>未来的授权</strong>：在使用GRANT和REVOKE时，用户账号必须存在，但对所涉及的对象没有这个要求</p>
+<p>​	这允许管理员在创建数据库和表之前设计和实现安全措施</p>
+<p>这样做的副作用是，当某个数据库或表被删除时(用DROP语句)，相关的访问权限仍然存在</p>
+<p>而且，如果将来重新创建该数据库或表，这些权限仍然起作用</p>
+<p><strong>简化多次授权</strong>：可通过列出各权限并用逗号分隔，将多条GRANT语句串在一起，如下所示：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GRANT SELECT, INSERT ON crashcourse.* TO bforta;</span><br></pre></td></tr></table></figure></div>
+
+
+
+<h3 id="更改口令"><a href="#更改口令" class="headerlink" title="更改口令"></a>更改口令</h3><p>为了更改用户口令，可使用<code>SET PASSWORD</code>语句</p>
+<p>新口令必须如下加密：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SET PASSWORD FOR bforta = Password(&#x27;n3w p@$$w0rd&#x27;);</span><br></pre></td></tr></table></figure></div>
+
+<p><code>SET PASSWORD</code>更新用户口令</p>
+<p>新口令必须传递到<code>Password()</code>函数进行加密</p>
+<p><code>SET PASSWORD</code>还可以用来设置你自己的口令：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SET PASSWORD = Password(&#x27;n3w p@$$w0rd&#x27;);</span><br></pre></td></tr></table></figure></div>
+
+<p>在不指定用户名时，<code>SET PASSWORD</code>更新当前登录用户的口令</p>
+<hr>
+<h1 id="数据库维护"><a href="#数据库维护" class="headerlink" title="数据库维护"></a>数据库维护</h1><p>如何进行常见的数据库维护</p>
+<h2 id="备份数据"><a href="#备份数据" class="headerlink" title="备份数据"></a>备份数据</h2><p>像所有数据一样，MySQL的数据也必须经常备份</p>
+<p>由于MySQL数据是基于磁盘的文件，普通的备份系统和例程就能备份MySQL的数据</p>
+<p>但是，由于这些文件总是处于打开和使用状态，普通的文件副本不一定总是有效的</p>
+<p>下面列出这个问题的可能解决方案：</p>
+<ul>
+<li>使用命令行实用程序mysqldump转储所有数据库内容到某个外部文件<ul>
+<li>在进行常规备份前这个使用程序应该正常运行，以便正确的备份转储文件</li>
+</ul>
+</li>
+<li>可用命令行使用程序mysqlhotcopy从一个数据库复制所有数据(并非所有数据库引擎都支持这个实用程序)</li>
+<li>可以使用MySQL的<code>BACKUP TABLE</code>或<code>SELECT INTO OUTFILE</code>转储所有数据到某个外部文件<ul>
+<li>这两条语句都接受将要创建的系统文件名，此系统文件必须不存在，否则会出错</li>
+<li>数据可以用<code>RESTORE TABLE</code>来复原</li>
+</ul>
+</li>
+</ul>
+<p><strong>首先刷新未写入数据</strong>：为了保证所有数据被写到磁盘(包括索引数据)，可能需要再进行备份前使用<code>FLUSH TABLES</code>语句</p>
+<h2 id="进行数据库维护"><a href="#进行数据库维护" class="headerlink" title="进行数据库维护"></a>进行数据库维护</h2><p>MySQL提供了一系列的语句，可以(应该)用来保证数据库正确和正常运行</p>
+<p>以下是应该知道的一些语句：</p>
+<ul>
+<li><code>ANALYZE TABLE</code>，用来检查表建是否正确</li>
+</ul>
+<p><code>ANALYZE TABLE</code>返回如下所示的状态信息：</p>
+<p>输入：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ANALYZE TABLE orders;</span><br></pre></td></tr></table></figure></div>
+
+<p>输出：</p>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Op</th>
+<th>Msg_type</th>
+<th>Msg_taxt</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>crashcourse.orders</td>
+<td>analyze</td>
+<td>status</td>
+<td>OK</td>
+</tr>
+</tbody></table>
+<ul>
+<li><code>CHECK TABLE</code>用来针对许多问题对表进行检查<ul>
+<li>在MyISAM表上海对索引进行检查</li>
+<li><code>CHECK TABLE</code>支持一系列的用于MyISAM表的方式</li>
+<li>CHANGED检查自最后一次检查以来改动过的表</li>
+<li>EXTENDED执行最彻底的检查<ul>
+<li>FAST只检查未正常关闭的表</li>
+<li>MEDIUM检查所有被删除的链接并进行键检查</li>
+<li>QUICK只进行快速扫描</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>如下所示，<code>CHECK TABLE</code>发现和修复问题：</p>
+<p>输入：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CHECK TABLE orders, orderitems;</span><br></pre></td></tr></table></figure></div>
+
+<p>输出：</p>
+<table>
+<thead>
+<tr>
+<th>Table</th>
+<th>Op</th>
+<th>Msg_type</th>
+<th>Msg_text</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>crashocourse.orders</td>
+<td>check</td>
+<td>status</td>
+<td>OK</td>
+</tr>
+<tr>
+<td>crashcourse.orderitems</td>
+<td>check</td>
+<td>warning</td>
+<td>Table is marked as crashed</td>
+</tr>
+<tr>
+<td>crashcourse.orderitems</td>
+<td>check</td>
+<td>status</td>
+<td>OK</td>
+</tr>
+</tbody></table>
+<ul>
+<li>如果MyTSAM表访问产生不正确和不一致的结果，可能需要用<code>REPAIR TABLE</code>来修复相应的表<ul>
+<li>这条语句不应该经常使用，如果需要经常使用，可能会有更大的问题要解决</li>
+</ul>
+</li>
+<li>如果从一个表中删除大量数据，应该使用<code>OPTIMIZE TABLE</code>来收回所用的空间，从而优化表的性能</li>
+</ul>
+<h2 id="诊断启动问题"><a href="#诊断启动问题" class="headerlink" title="诊断启动问题"></a>诊断启动问题</h2><p>服务器启动问题通常在对MySQL配置或服务器本身进行更改时出现</p>
+<p>MySQL在这个问题发生时报告错误，但由于多数MySQL服务器是作为系统进程或服务自动启动的，这些消息可能看不到</p>
+<p>在排除系统启动问题时，首先应该尽量用手动启动服务器</p>
+<p>MySQL服务器自身通过在命令行上执行mysqld启动</p>
+<p>下面是几个重要的mysqld命令行选项：</p>
+<ul>
+<li><code>--help</code>：显式帮助——一个选项列表</li>
+<li><code>--safe-mode</code>：装载减去某些最佳配置的服务器</li>
+<li><code>--verbose</code>：显式全文本消息(为获得更详细的帮助消息与<code>--help</code>联合使用)</li>
+<li><code>--version</code>：显式版本信息然后退出</li>
+</ul>
+<p>几个另外的命令行选项(与日志文件有关)在下节列出</p>
+<h2 id="查看日志文件"><a href="#查看日志文件" class="headerlink" title="查看日志文件"></a>查看日志文件</h2><p>MySQL维护管理员依赖的一系列日志文件</p>
+<p>主要的日志文件有以下几中：</p>
+<ul>
+<li>错误日志<ul>
+<li>它包含启动和关闭问题以及任意关键错误的细节</li>
+<li>此日志通常名为<code>hostname.err</code>，位于data目录中</li>
+<li>此日志名可用<code>--log-error</code>命令行选项更改</li>
+</ul>
+</li>
+<li>查询日志<ul>
+<li>它记录所有MySQL活动，在诊断问题时非常有用</li>
+<li>此日志文件可能会很快的变得非常大，因此不应该长期使用它</li>
+<li>此日志通常名为<code>hostname.log</code>，位于data目录中</li>
+<li>此名字可以用<code>--log</code>命令行选项更改</li>
+</ul>
+</li>
+<li>二进制日志<ul>
+<li>它记录更新过数据(或啃更新过数据)的所有语句</li>
+<li>此日志通常名为<code>hostname-bin</code>，位于data目录内</li>
+<li>此名字可以用<code>--log-bin</code>命令行选项更改</li>
+<li>注意，这个日志文件是MySQL5中添加的，以前的MySQL版本中使用的是更新日志</li>
+</ul>
+</li>
+<li>缓慢查询日志<ul>
+<li>此日志记录执行缓慢的任何查询</li>
+<li>这个日志在确定数据库何处需要优化很有用</li>
+<li>此日志通常名为<code>hostname-slow.log</code>，位于data目录中</li>
+<li>此名字可以用<code>--log-slow-queries</code>命令行选项更改</li>
+</ul>
+</li>
+</ul>
+<p>在使用日志时，可用<code>FLUSH LOGS</code>语句来刷新和重新开始所有的日志文件</p>
+<hr>
+<h1 id="改善性能"><a href="#改善性能" class="headerlink" title="改善性能"></a>改善性能</h1><p>复习与MySQL性能有关的某些要点</p>
+<h2 id="改善性能-1"><a href="#改善性能-1" class="headerlink" title="改善性能"></a>改善性能</h2><p>数据库管理员生命中的大部分时间在调整、试验以及改善DBMS性能上(</p>
+<p>在诊断应用的滞缓现象和性能问题时，性能不良的数据库(以及数据库查询)通常是最常见的祸因</p>
+<p>可见，下面的内容并不能完全决定MySQL的性能</p>
+<p>只是想回顾一下前面的重点，提供进行性能优化探讨和分析的一个出发点</p>
+<ul>
+<li>首先，MySQL(与所有DBMS一样)具有特定的硬件协议<ul>
+<li>在学习和研究MySQL时，使用任何旧的计算机作为服务器都可以</li>
+<li>但对于生产的服务器来说，应该坚持遵循这些硬件建议</li>
+</ul>
+</li>
+<li>一般来说，关键的生产DBMS应该运行在自己的专用服务器上</li>
+<li>MySQL是用一系列的默认设置预先配置的，从这些设置开始通常是很好的<ul>
+<li>但过段时间后可能需要调整内存分配、缓冲区大小等(为查看当前设置，可使用<code>SHOW VARIABLES;</code>和<code>SHOW STATUS;</code>)</li>
+</ul>
+</li>
+<li>MySQL一个多用户多线程的DBMS<ul>
+<li>就是说，它经常同时执行多个任务</li>
+<li>如果这些任务重的某一个执行缓慢，则所有请求都会执行缓慢</li>
+<li>如果遇到显著的性能不良没课使用<code>SHOW PROCESSLIST</code>显式所有活动进程(以及它们的线程ID和执行时间)</li>
+<li>还可以用KILL命令终结某个特定的进程(使用这个命令需要作为管理员登录)</li>
+</ul>
+</li>
+<li>总是有不止一种方法编写同一条SELECT语句<ul>
+<li>应该试验联结、并、子查询等，找出最佳的方法</li>
+</ul>
+</li>
+<li>使用<code>EXPLAIN</code>语句让MySQL解释它将如何执行一条SELECT语句</li>
+<li>一般来说，存储过程执行的比一条一条的执行其中的各条MySQL语句块</li>
+<li>应该总是使用正确的数据类型</li>
+<li>绝不要检索比需求还要多的数据<ul>
+<li>换言之，不要用<code>SELECT *</code>(除非真正需要每个列)</li>
+</ul>
+</li>
+<li>有的操作(包括<code>INSERT</code>)支持一个可选的<code>DELAYED</code>关键字<ul>
+<li>如果使用它，将把控制立即返回给调用程序，并且一旦有可能就实际执行该操作</li>
+</ul>
+</li>
+<li>在导入数据时，应该关闭自动提交<ul>
+<li>你可能还想删除索引(包括<code>FULLTEXT</code>索引)，然后在导入完成后再重建它们</li>
+</ul>
+</li>
+<li>必须索引数据库表以改善数据检索的性能<ul>
+<li>确定索引什么不是一件微不足道的任务，需要分析使用的SELECT语句以找到重复的<code>WHERE</code>和<code>ORDER BY</code>子句</li>
+<li>如果一个简单的WHERE子句返回结果所花费的时间太长，则可以断定其中使用的列(或几个列)就是需要索引的对象</li>
+</ul>
+</li>
+<li>你的SELECT语句中有一系列复杂的OR条件吗？<ul>
+<li>通过使用多条SELECT语句和连接它们的UNION语句，你能看到极大的性能改进</li>
+</ul>
+</li>
+<li>索引改善数据检索的性能，但损害数据插入、删除和更新的性能<ul>
+<li>如果你有一些表，它们收集数据且不经常被搜索，则在有必要之前不要索引它们(索引可根据需要添加和删除)</li>
+</ul>
+</li>
+<li>LIKE很慢<ul>
+<li>一般来说，最好是使用<code>FULLTEXT</code>而不是LIKE</li>
+</ul>
+</li>
+<li>数据库是不断变化的实体<ul>
+<li>一组优化良好的表一会儿后可能就面目全非了</li>
+<li>由于表的使用和内容的更改，理想的优化和配置也会改变</li>
+</ul>
+</li>
+<li>最重要的规则就是，每条规则在某些提哦啊见下都会被打破</li>
+</ul>
+<p><strong>浏览文档</strong>：位于<a class="link"   target="_blank" rel="noopener" href="http://dev.mysql.com/doc/%E7%9A%84MySQL%E6%96%87%E6%A1%A3%E6%9C%89%E8%AE%B8%E5%A4%9A%E6%8F%90%E7%A4%BA%E5%92%8C%E6%8A%80%E5%B7%A7%EF%BC%88%E7%94%9A%E8%87%B3%E6%9C%89%E7%94%A8%E6%88%B7%E6%8F%90%E4%BE%9B%E7%9A%84%E8%AF%84%E8%AE%BA%E5%92%8C%E5%8F%8D%E9%A6%88%EF%BC%89" >http://dev.mysql.com/doc/的MySQL文档有许多提示和技巧（甚至有用户提供的评论和反馈） <i class="fa-regular fa-arrow-up-right-from-square fa-sm"></i></a></p>
+<p>​	一定要查看这些非常有价值的资料</p>
+<hr>
+<p>(完结撒花)</p>
 
         </div>
 
@@ -2691,7 +3398,7 @@ DECLARE语句用来定义和命名游标，这里为ordernumbers
         
             <li>
                 <strong>更新于
-                    :</strong> 2024-11-04 12:33:37
+                    :</strong> 2024-11-05 21:30:08
             </li>
         
         <li>
@@ -2780,7 +3487,7 @@ DECLARE语句用来定义和命名游标，这里为ordernumbers
     <div class="post-toc">
         <div class="toc-title">目录</div>
         <div class="page-title">MySQL必知必会笔记</div>
-        <ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8MySQL"><span class="nav-text">使用MySQL</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%89%E6%8B%A9%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-text">选择数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%86%E8%A7%A3%E6%95%B0%E6%8D%AE%E5%BA%93%E5%92%8C%E8%A1%A8"><span class="nav-text">了解数据库和表</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A3%80%E7%B4%A2%E6%95%B0%E6%8D%AE"><span class="nav-text">检索数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SELECT%E8%AF%AD%E5%8F%A5"><span class="nav-text">SELECT语句</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A3%80%E7%B4%A2%E5%8D%95%E4%B8%AA%E5%88%97"><span class="nav-text">检索单个列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A3%80%E7%B4%A2%E5%A4%9A%E4%B8%AA%E5%88%97"><span class="nav-text">检索多个列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A3%80%E7%B4%A2%E6%89%80%E6%9C%89%E5%88%97"><span class="nav-text">检索所有列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A3%80%E7%B4%A2%E4%B8%8D%E5%90%8C%E7%9A%84%E8%A1%8C"><span class="nav-text">检索不同的行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%99%90%E5%88%B6%E7%BB%93%E6%9E%9C"><span class="nav-text">限制结果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%AE%8C%E5%85%A8%E9%99%90%E5%AE%9A%E7%9A%84%E8%A1%A8%E5%90%8D"><span class="nav-text">使用完全限定的表名</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8E%92%E5%BA%8F%E6%A3%80%E7%B4%A2%E6%95%B0%E6%8D%AE"><span class="nav-text">排序检索数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%92%E5%BA%8F%E6%95%B0%E6%8D%AE"><span class="nav-text">排序数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%89%E5%A4%9A%E4%B8%AA%E5%88%97%E6%8E%92%E5%BA%8F"><span class="nav-text">按多个列排序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%87%E5%AE%9A%E6%8E%92%E5%BA%8F%E6%96%B9%E5%90%91"><span class="nav-text">指定排序方向</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%87%E6%BB%A4%E6%95%B0%E6%8D%AE"><span class="nav-text">过滤数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8WHERE%E5%AD%90%E5%8F%A5"><span class="nav-text">使用WHERE子句</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WHERE%E5%AD%90%E5%8F%A5%E6%93%8D%E4%BD%9C%E7%AC%A6"><span class="nav-text">WHERE子句操作符</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A3%80%E6%9F%A5%E5%8D%95%E4%B8%AA%E5%80%BC"><span class="nav-text">检查单个值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E5%8C%B9%E9%85%8D%E6%A3%80%E6%9F%A5"><span class="nav-text">不匹配检查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8C%83%E5%9B%B4%E5%80%BC%E6%A3%80%E6%9F%A5"><span class="nav-text">范围值检查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A9%BA%E5%80%BC%E6%A3%80%E6%9F%A5"><span class="nav-text">空值检查</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E8%BF%87%E6%BB%A4"><span class="nav-text">数据过滤</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%84%E5%90%88WHERE%E5%AD%90%E5%8F%A5"><span class="nav-text">组合WHERE子句</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AND%E6%93%8D%E4%BD%9C%E7%AC%A6"><span class="nav-text">AND操作符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OR%E6%93%8D%E4%BD%9C%E7%AC%A6"><span class="nav-text">OR操作符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E6%AC%A1%E5%BA%8F"><span class="nav-text">计算次序</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IN%E6%93%8D%E4%BD%9C%E7%AC%A6"><span class="nav-text">IN操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NOT%E6%93%8D%E4%BD%9C%E7%AC%A6"><span class="nav-text">NOT操作符</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%94%A8%E9%80%9A%E9%85%8D%E7%AC%A6%E8%BF%9B%E8%A1%8C%E8%BF%87%E6%BB%A4"><span class="nav-text">用通配符进行过滤</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#LIKE%E6%93%8D%E4%BD%9C%E7%AC%A6"><span class="nav-text">LIKE操作符</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%99%BE%E5%88%86%E5%8F%B7-%E9%80%9A%E9%85%8D%E7%AC%A6"><span class="nav-text">百分号(%)通配符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8B%E5%88%92%E7%BA%BF-%E9%80%9A%E9%85%8D%E7%AC%A6"><span class="nav-text">下划线(_)通配符</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E9%80%9A%E9%85%8D%E7%AC%A6%E7%9A%84%E6%8A%80%E5%B7%A7"><span class="nav-text">使用通配符的技巧</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%94%A8%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E8%BF%9B%E8%A1%8C%E6%90%9C%E7%B4%A2"><span class="nav-text">用正则表达式进行搜索</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E4%BB%8B%E7%BB%8D"><span class="nav-text">正则表达式介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8MySQL%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-text">使用MySQL正则表达式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E5%AD%97%E7%AC%A6%E5%8C%B9%E9%85%8D"><span class="nav-text">基本字符匹配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E8%A1%8COR%E5%8C%B9%E9%85%8D"><span class="nav-text">进行OR匹配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D%E5%87%A0%E4%B8%AA%E5%AD%97%E7%AC%A6%E4%B9%8B%E4%B8%80"><span class="nav-text">匹配几个字符之一</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D%E8%8C%83%E5%9B%B4"><span class="nav-text">匹配范围</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6"><span class="nav-text">匹配特殊字符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D%E5%AD%97%E7%AC%A6%E7%B1%BB"><span class="nav-text">匹配字符类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D%E5%A4%9A%E4%B8%AA%E5%AE%9E%E4%BE%8B"><span class="nav-text">匹配多个实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9A%E4%BD%8D%E7%AC%A6"><span class="nav-text">定位符</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E8%AE%A1%E7%AE%97%E5%AD%97%E6%AE%B5"><span class="nav-text">创建计算字段</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E5%AD%97%E6%AE%B5"><span class="nav-text">计算字段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%BC%E6%8E%A5%E5%AD%97%E6%AE%B5"><span class="nav-text">拼接字段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C%E7%AE%97%E6%95%B0%E8%AE%A1%E7%AE%97"><span class="nav-text">执行算数计算</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E5%87%BD%E6%95%B0"><span class="nav-text">使用数据处理函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0"><span class="nav-text">函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%87%BD%E6%95%B0"><span class="nav-text">使用函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E5%87%BD%E6%95%B0"><span class="nav-text">文本处理函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%A5%E6%9C%9F%E5%92%8C%E6%97%B6%E9%97%B4%E5%A4%84%E7%90%86%E5%87%BD%E6%95%B0"><span class="nav-text">日期和时间处理函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E7%BB%84%E5%A4%84%E7%90%86%E5%87%BD%E6%95%B0"><span class="nav-text">数组处理函数</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B1%87%E6%80%BB%E6%95%B0%E6%8D%AE"><span class="nav-text">汇总数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%81%9A%E9%9B%86%E5%87%BD%E6%95%B0"><span class="nav-text">聚集函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AVG-%E5%87%BD%E6%95%B0"><span class="nav-text">AVG()函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#COUNT-%E5%87%BD%E6%95%B0"><span class="nav-text">COUNT()函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MAX-%E5%87%BD%E6%95%B0"><span class="nav-text">MAX()函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MIN-%E5%87%BD%E6%95%B0"><span class="nav-text">MIN()函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SUM-%E5%87%BD%E6%95%B0"><span class="nav-text">SUM()函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%81%9A%E9%9B%86%E4%B8%8D%E5%90%8C%E5%80%BC"><span class="nav-text">聚集不同值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%84%E5%90%88%E8%81%9A%E9%9B%86%E5%87%BD%E6%95%B0"><span class="nav-text">组合聚集函数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E7%BB%84%E6%95%B0%E6%8D%AE"><span class="nav-text">分组数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%88%86%E7%BB%84"><span class="nav-text">数据分组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%88%86%E7%BB%84"><span class="nav-text">创建分组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%87%E6%BB%A4%E5%88%86%E7%BB%84"><span class="nav-text">过滤分组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E7%BB%84%E5%92%8C%E6%8E%92%E5%BA%8F"><span class="nav-text">分组和排序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SELECT%E5%AD%90%E5%8F%A5%E9%A1%BA%E5%BA%8F"><span class="nav-text">SELECT子句顺序</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%AD%90%E6%9F%A5%E8%AF%A2"><span class="nav-text">使用子查询</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%90%E6%9F%A5%E8%AF%A2"><span class="nav-text">子查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A9%E7%94%A8%E5%AD%90%E6%9F%A5%E8%AF%A2%E8%BF%9B%E8%A1%8C%E8%BF%87%E6%BB%A4"><span class="nav-text">利用子查询进行过滤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%9C%E4%B8%BA%E8%AE%A1%E7%AE%97%E5%AD%97%E6%AE%B5%E4%BD%BF%E7%94%A8%E5%AD%90%E6%9F%A5%E8%AF%A2"><span class="nav-text">作为计算字段使用子查询</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%81%94%E7%BB%93%E8%A1%A8"><span class="nav-text">联结表</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%81%94%E7%BB%93"><span class="nav-text">联结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E7%B3%BB%E8%A1%A8"><span class="nav-text">关系表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E4%BD%BF%E7%94%A8%E8%81%94%E7%BB%93"><span class="nav-text">为什么要使用联结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E8%81%94%E7%BB%93"><span class="nav-text">创建联结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#WHERE%E5%AD%90%E5%8F%A5%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7"><span class="nav-text">WHERE子句的重要性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%85%E9%83%A8%E8%81%94%E7%BB%93"><span class="nav-text">内部联结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%81%94%E7%BB%93%E5%A4%9A%E4%B8%AA%E8%A1%A8"><span class="nav-text">联结多个表</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E9%AB%98%E7%BA%A7%E8%81%94%E7%BB%93"><span class="nav-text">创建高级联结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%A1%A8%E5%88%AB%E5%90%8D"><span class="nav-text">使用表别名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E4%B8%8D%E5%90%8C%E7%B1%BB%E5%9E%8B%E7%9A%84%E8%81%94%E7%BB%93"><span class="nav-text">使用不同类型的联结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E8%81%94%E7%BB%93"><span class="nav-text">自联结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E7%84%B6%E8%81%94%E7%BB%93"><span class="nav-text">自然联结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%96%E9%83%A8%E8%81%94%E7%BB%93"><span class="nav-text">外部联结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%B8%A6%E8%81%9A%E9%9B%86%E5%87%BD%E6%95%B0%E7%9A%84%E8%81%94%E7%BB%93"><span class="nav-text">使用带聚集函数的联结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%81%94%E7%BB%93%E5%92%8C%E8%81%94%E7%BB%93%E6%9D%A1%E4%BB%B6"><span class="nav-text">使用联结和联结条件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%84%E5%90%88%E6%9F%A5%E8%AF%A2"><span class="nav-text">组合查询</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%84%E5%90%88%E6%9F%A5%E8%AF%A2-1"><span class="nav-text">组合查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E7%BB%84%E5%90%88%E6%9F%A5%E8%AF%A2"><span class="nav-text">创建组合查询</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8UNION"><span class="nav-text">使用UNION</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UNION%E8%A7%84%E5%88%99"><span class="nav-text">UNION规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%85%E5%90%AB%E6%88%96%E5%8F%96%E6%B6%88%E9%87%8D%E5%A4%8D%E7%9A%84%E8%A1%8C"><span class="nav-text">包含或取消重复的行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E7%BB%84%E5%90%88%E6%9F%A5%E8%AF%A2%E7%BB%93%E6%9E%9C%E6%8E%92%E5%BA%8F"><span class="nav-text">对组合查询结果排序</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%A8%E6%96%87%E6%9C%AC%E6%90%9C%E7%B4%A2"><span class="nav-text">全文本搜索</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%90%86%E8%A7%A3%E5%85%A8%E6%96%87%E6%9C%AC%E6%90%9C%E7%B4%A2"><span class="nav-text">理解全文本搜索</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%85%A8%E6%96%87%E6%9C%AC%E6%90%9C%E7%B4%A2"><span class="nav-text">使用全文本搜索</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%AF%E7%94%A8%E5%85%A8%E6%96%87%E6%9C%AC%E6%90%9C%E7%B4%A2%E6%94%AF%E6%8C%81"><span class="nav-text">启用全文本搜索支持</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E8%A1%8C%E5%85%A8%E6%96%87%E6%9C%AC%E6%90%9C%E7%B4%A2"><span class="nav-text">进行全文本搜索</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%9F%A5%E8%AF%A2%E6%89%A9%E5%B1%95"><span class="nav-text">使用查询扩展</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%83%E5%B0%94%E6%96%87%E6%9C%AC%E6%90%9C%E7%B4%A2"><span class="nav-text">布尔文本搜索</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%A8%E6%96%87%E6%9C%AC%E6%90%9C%E7%B4%A2%E7%9A%84%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E"><span class="nav-text">全文本搜索的使用说明</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E6%95%B0%E6%8D%AE"><span class="nav-text">插入数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%8F%92%E5%85%A5"><span class="nav-text">数据插入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E5%AE%8C%E6%95%B4%E7%9A%84%E8%A1%8C"><span class="nav-text">插入完整的行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E5%A4%9A%E4%B8%AA%E8%A1%8C"><span class="nav-text">插入多个行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E6%A3%80%E7%B4%A2%E5%87%BA%E7%9A%84%E6%95%B0%E6%8D%AE"><span class="nav-text">插入检索出的数据</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0%E5%92%8C%E5%88%A0%E9%99%A4%E6%95%B0%E6%8D%AE"><span class="nav-text">更新和删除数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0%E6%95%B0%E6%8D%AE"><span class="nav-text">更新数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E6%95%B0%E6%8D%AE"><span class="nav-text">删除数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0%E5%92%8C%E5%88%A0%E9%99%A4%E7%9A%84%E6%8C%87%E5%AF%BC%E5%8E%9F%E5%88%99"><span class="nav-text">更新和删除的指导原则</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%92%8C%E6%93%8D%E7%BA%B5%E8%A1%A8"><span class="nav-text">创建和操纵表</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E8%A1%A8"><span class="nav-text">创建表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A1%A8%E5%88%9B%E5%BB%BA%E5%9F%BA%E7%A1%80"><span class="nav-text">表创建基础</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8NULL%E5%80%BC"><span class="nav-text">使用NULL值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E9%94%AE%E5%86%8D%E4%BB%8B%E7%BB%8D"><span class="nav-text">主键再介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8AUTO-INCREMENT"><span class="nav-text">使用AUTO_INCREMENT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E5%AE%9A%E9%BB%98%E8%AE%A4%E5%80%BC"><span class="nav-text">指定默认值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%95%E6%93%8E%E7%B1%BB%E5%9E%8B"><span class="nav-text">引擎类型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0%E8%A1%A8"><span class="nav-text">更新表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E8%A1%A8"><span class="nav-text">删除表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E5%91%BD%E5%90%8D%E8%A1%A8"><span class="nav-text">重命名表</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%A7%86%E5%9B%BE"><span class="nav-text">使用视图</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%86%E5%9B%BE"><span class="nav-text">视图</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BD%BF%E7%94%A8%E8%A7%86%E5%9B%BE"><span class="nav-text">为什么使用视图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%86%E5%9B%BE%E7%9A%84%E8%A7%84%E5%88%99%E5%92%8C%E9%99%90%E5%88%B6"><span class="nav-text">视图的规则和限制</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%A7%86%E5%9B%BE-1"><span class="nav-text">使用视图</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8%E8%A7%86%E5%9B%BE%E7%AE%80%E5%8C%96%E5%A4%8D%E6%9D%82%E7%9A%84%E8%81%94%E7%BB%93"><span class="nav-text">利用视图简化复杂的联结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E8%A7%86%E5%9B%BE%E9%87%8D%E6%96%B0%E6%A0%BC%E5%BC%8F%E5%8C%96%E6%A3%80%E7%B4%A2%E5%87%BA%E7%9A%84%E6%95%B0%E6%8D%AE"><span class="nav-text">用视图重新格式化检索出的数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E8%A7%86%E5%9B%BE%E8%BF%87%E6%BB%A4%E4%B8%8D%E6%83%B3%E8%A6%81%E7%9A%84%E6%95%B0%E6%8D%AE"><span class="nav-text">用视图过滤不想要的数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%A7%86%E5%9B%BE%E4%B8%8E%E8%AE%A1%E7%AE%97%E5%AD%97%E6%AE%B5"><span class="nav-text">使用视图与计算字段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0%E8%A7%86%E5%9B%BE"><span class="nav-text">更新视图</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B"><span class="nav-text">使用存储过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B"><span class="nav-text">存储过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E4%BD%BF%E7%94%A8%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B"><span class="nav-text">为什么要使用存储过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B-1"><span class="nav-text">使用存储过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B"><span class="nav-text">创建存储过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B"><span class="nav-text">删除存储过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%8F%82%E6%95%B0"><span class="nav-text">使用参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E6%99%BA%E8%83%BD%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B"><span class="nav-text">建立智能存储过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A3%80%E6%9F%A5%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B"><span class="nav-text">检查存储过程</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%B8%B8%E6%A0%87"><span class="nav-text">使用游标</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%B8%E6%A0%87"><span class="nav-text">游标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%B8%B8%E6%A0%87-1"><span class="nav-text">使用游标</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E6%B8%B8%E6%A0%87"><span class="nav-text">创建游标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%93%E5%BC%80%E5%92%8C%E5%85%B3%E9%97%AD%E6%B8%B8%E6%A0%87"><span class="nav-text">打开和关闭游标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%B8%B8%E6%A0%87%E6%95%B0%E6%8D%AE"><span class="nav-text">使用游标数据</span></a></li></ol></li></ol></li></ol>
+        <ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8MySQL"><span class="nav-text">使用MySQL</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%89%E6%8B%A9%E6%95%B0%E6%8D%AE%E5%BA%93"><span class="nav-text">选择数据库</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%86%E8%A7%A3%E6%95%B0%E6%8D%AE%E5%BA%93%E5%92%8C%E8%A1%A8"><span class="nav-text">了解数据库和表</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%A3%80%E7%B4%A2%E6%95%B0%E6%8D%AE"><span class="nav-text">检索数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SELECT%E8%AF%AD%E5%8F%A5"><span class="nav-text">SELECT语句</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A3%80%E7%B4%A2%E5%8D%95%E4%B8%AA%E5%88%97"><span class="nav-text">检索单个列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A3%80%E7%B4%A2%E5%A4%9A%E4%B8%AA%E5%88%97"><span class="nav-text">检索多个列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A3%80%E7%B4%A2%E6%89%80%E6%9C%89%E5%88%97"><span class="nav-text">检索所有列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A3%80%E7%B4%A2%E4%B8%8D%E5%90%8C%E7%9A%84%E8%A1%8C"><span class="nav-text">检索不同的行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%99%90%E5%88%B6%E7%BB%93%E6%9E%9C"><span class="nav-text">限制结果</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%AE%8C%E5%85%A8%E9%99%90%E5%AE%9A%E7%9A%84%E8%A1%A8%E5%90%8D"><span class="nav-text">使用完全限定的表名</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8E%92%E5%BA%8F%E6%A3%80%E7%B4%A2%E6%95%B0%E6%8D%AE"><span class="nav-text">排序检索数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%92%E5%BA%8F%E6%95%B0%E6%8D%AE"><span class="nav-text">排序数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%89%E5%A4%9A%E4%B8%AA%E5%88%97%E6%8E%92%E5%BA%8F"><span class="nav-text">按多个列排序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%87%E5%AE%9A%E6%8E%92%E5%BA%8F%E6%96%B9%E5%90%91"><span class="nav-text">指定排序方向</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%BF%87%E6%BB%A4%E6%95%B0%E6%8D%AE"><span class="nav-text">过滤数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8WHERE%E5%AD%90%E5%8F%A5"><span class="nav-text">使用WHERE子句</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#WHERE%E5%AD%90%E5%8F%A5%E6%93%8D%E4%BD%9C%E7%AC%A6"><span class="nav-text">WHERE子句操作符</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A3%80%E6%9F%A5%E5%8D%95%E4%B8%AA%E5%80%BC"><span class="nav-text">检查单个值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8D%E5%8C%B9%E9%85%8D%E6%A3%80%E6%9F%A5"><span class="nav-text">不匹配检查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8C%83%E5%9B%B4%E5%80%BC%E6%A3%80%E6%9F%A5"><span class="nav-text">范围值检查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A9%BA%E5%80%BC%E6%A3%80%E6%9F%A5"><span class="nav-text">空值检查</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E8%BF%87%E6%BB%A4"><span class="nav-text">数据过滤</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%84%E5%90%88WHERE%E5%AD%90%E5%8F%A5"><span class="nav-text">组合WHERE子句</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AND%E6%93%8D%E4%BD%9C%E7%AC%A6"><span class="nav-text">AND操作符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OR%E6%93%8D%E4%BD%9C%E7%AC%A6"><span class="nav-text">OR操作符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E6%AC%A1%E5%BA%8F"><span class="nav-text">计算次序</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IN%E6%93%8D%E4%BD%9C%E7%AC%A6"><span class="nav-text">IN操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NOT%E6%93%8D%E4%BD%9C%E7%AC%A6"><span class="nav-text">NOT操作符</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%94%A8%E9%80%9A%E9%85%8D%E7%AC%A6%E8%BF%9B%E8%A1%8C%E8%BF%87%E6%BB%A4"><span class="nav-text">用通配符进行过滤</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#LIKE%E6%93%8D%E4%BD%9C%E7%AC%A6"><span class="nav-text">LIKE操作符</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%99%BE%E5%88%86%E5%8F%B7-%E9%80%9A%E9%85%8D%E7%AC%A6"><span class="nav-text">百分号(%)通配符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%8B%E5%88%92%E7%BA%BF-%E9%80%9A%E9%85%8D%E7%AC%A6"><span class="nav-text">下划线(_)通配符</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E9%80%9A%E9%85%8D%E7%AC%A6%E7%9A%84%E6%8A%80%E5%B7%A7"><span class="nav-text">使用通配符的技巧</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%94%A8%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E8%BF%9B%E8%A1%8C%E6%90%9C%E7%B4%A2"><span class="nav-text">用正则表达式进行搜索</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F%E4%BB%8B%E7%BB%8D"><span class="nav-text">正则表达式介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8MySQL%E6%AD%A3%E5%88%99%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-text">使用MySQL正则表达式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E5%AD%97%E7%AC%A6%E5%8C%B9%E9%85%8D"><span class="nav-text">基本字符匹配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E8%A1%8COR%E5%8C%B9%E9%85%8D"><span class="nav-text">进行OR匹配</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D%E5%87%A0%E4%B8%AA%E5%AD%97%E7%AC%A6%E4%B9%8B%E4%B8%80"><span class="nav-text">匹配几个字符之一</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D%E8%8C%83%E5%9B%B4"><span class="nav-text">匹配范围</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D%E7%89%B9%E6%AE%8A%E5%AD%97%E7%AC%A6"><span class="nav-text">匹配特殊字符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D%E5%AD%97%E7%AC%A6%E7%B1%BB"><span class="nav-text">匹配字符类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%B9%E9%85%8D%E5%A4%9A%E4%B8%AA%E5%AE%9E%E4%BE%8B"><span class="nav-text">匹配多个实例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9A%E4%BD%8D%E7%AC%A6"><span class="nav-text">定位符</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E8%AE%A1%E7%AE%97%E5%AD%97%E6%AE%B5"><span class="nav-text">创建计算字段</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A1%E7%AE%97%E5%AD%97%E6%AE%B5"><span class="nav-text">计算字段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%BC%E6%8E%A5%E5%AD%97%E6%AE%B5"><span class="nav-text">拼接字段</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C%E7%AE%97%E6%95%B0%E8%AE%A1%E7%AE%97"><span class="nav-text">执行算数计算</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86%E5%87%BD%E6%95%B0"><span class="nav-text">使用数据处理函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0"><span class="nav-text">函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%87%BD%E6%95%B0"><span class="nav-text">使用函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E6%9C%AC%E5%A4%84%E7%90%86%E5%87%BD%E6%95%B0"><span class="nav-text">文本处理函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%A5%E6%9C%9F%E5%92%8C%E6%97%B6%E9%97%B4%E5%A4%84%E7%90%86%E5%87%BD%E6%95%B0"><span class="nav-text">日期和时间处理函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E7%BB%84%E5%A4%84%E7%90%86%E5%87%BD%E6%95%B0"><span class="nav-text">数组处理函数</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B1%87%E6%80%BB%E6%95%B0%E6%8D%AE"><span class="nav-text">汇总数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%81%9A%E9%9B%86%E5%87%BD%E6%95%B0"><span class="nav-text">聚集函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AVG-%E5%87%BD%E6%95%B0"><span class="nav-text">AVG()函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#COUNT-%E5%87%BD%E6%95%B0"><span class="nav-text">COUNT()函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MAX-%E5%87%BD%E6%95%B0"><span class="nav-text">MAX()函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#MIN-%E5%87%BD%E6%95%B0"><span class="nav-text">MIN()函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SUM-%E5%87%BD%E6%95%B0"><span class="nav-text">SUM()函数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%81%9A%E9%9B%86%E4%B8%8D%E5%90%8C%E5%80%BC"><span class="nav-text">聚集不同值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%84%E5%90%88%E8%81%9A%E9%9B%86%E5%87%BD%E6%95%B0"><span class="nav-text">组合聚集函数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%86%E7%BB%84%E6%95%B0%E6%8D%AE"><span class="nav-text">分组数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%88%86%E7%BB%84"><span class="nav-text">数据分组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%88%86%E7%BB%84"><span class="nav-text">创建分组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%87%E6%BB%A4%E5%88%86%E7%BB%84"><span class="nav-text">过滤分组</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E7%BB%84%E5%92%8C%E6%8E%92%E5%BA%8F"><span class="nav-text">分组和排序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SELECT%E5%AD%90%E5%8F%A5%E9%A1%BA%E5%BA%8F"><span class="nav-text">SELECT子句顺序</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%AD%90%E6%9F%A5%E8%AF%A2"><span class="nav-text">使用子查询</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%90%E6%9F%A5%E8%AF%A2"><span class="nav-text">子查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A9%E7%94%A8%E5%AD%90%E6%9F%A5%E8%AF%A2%E8%BF%9B%E8%A1%8C%E8%BF%87%E6%BB%A4"><span class="nav-text">利用子查询进行过滤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%9C%E4%B8%BA%E8%AE%A1%E7%AE%97%E5%AD%97%E6%AE%B5%E4%BD%BF%E7%94%A8%E5%AD%90%E6%9F%A5%E8%AF%A2"><span class="nav-text">作为计算字段使用子查询</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%81%94%E7%BB%93%E8%A1%A8"><span class="nav-text">联结表</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%81%94%E7%BB%93"><span class="nav-text">联结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E7%B3%BB%E8%A1%A8"><span class="nav-text">关系表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E4%BD%BF%E7%94%A8%E8%81%94%E7%BB%93"><span class="nav-text">为什么要使用联结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E8%81%94%E7%BB%93"><span class="nav-text">创建联结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#WHERE%E5%AD%90%E5%8F%A5%E7%9A%84%E9%87%8D%E8%A6%81%E6%80%A7"><span class="nav-text">WHERE子句的重要性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%85%E9%83%A8%E8%81%94%E7%BB%93"><span class="nav-text">内部联结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%81%94%E7%BB%93%E5%A4%9A%E4%B8%AA%E8%A1%A8"><span class="nav-text">联结多个表</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E9%AB%98%E7%BA%A7%E8%81%94%E7%BB%93"><span class="nav-text">创建高级联结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%A1%A8%E5%88%AB%E5%90%8D"><span class="nav-text">使用表别名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E4%B8%8D%E5%90%8C%E7%B1%BB%E5%9E%8B%E7%9A%84%E8%81%94%E7%BB%93"><span class="nav-text">使用不同类型的联结</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E8%81%94%E7%BB%93"><span class="nav-text">自联结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%87%AA%E7%84%B6%E8%81%94%E7%BB%93"><span class="nav-text">自然联结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%96%E9%83%A8%E8%81%94%E7%BB%93"><span class="nav-text">外部联结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%B8%A6%E8%81%9A%E9%9B%86%E5%87%BD%E6%95%B0%E7%9A%84%E8%81%94%E7%BB%93"><span class="nav-text">使用带聚集函数的联结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%81%94%E7%BB%93%E5%92%8C%E8%81%94%E7%BB%93%E6%9D%A1%E4%BB%B6"><span class="nav-text">使用联结和联结条件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%84%E5%90%88%E6%9F%A5%E8%AF%A2"><span class="nav-text">组合查询</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%84%E5%90%88%E6%9F%A5%E8%AF%A2-1"><span class="nav-text">组合查询</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E7%BB%84%E5%90%88%E6%9F%A5%E8%AF%A2"><span class="nav-text">创建组合查询</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8UNION"><span class="nav-text">使用UNION</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UNION%E8%A7%84%E5%88%99"><span class="nav-text">UNION规则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8C%85%E5%90%AB%E6%88%96%E5%8F%96%E6%B6%88%E9%87%8D%E5%A4%8D%E7%9A%84%E8%A1%8C"><span class="nav-text">包含或取消重复的行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%B9%E7%BB%84%E5%90%88%E6%9F%A5%E8%AF%A2%E7%BB%93%E6%9E%9C%E6%8E%92%E5%BA%8F"><span class="nav-text">对组合查询结果排序</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%A8%E6%96%87%E6%9C%AC%E6%90%9C%E7%B4%A2"><span class="nav-text">全文本搜索</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%90%86%E8%A7%A3%E5%85%A8%E6%96%87%E6%9C%AC%E6%90%9C%E7%B4%A2"><span class="nav-text">理解全文本搜索</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%85%A8%E6%96%87%E6%9C%AC%E6%90%9C%E7%B4%A2"><span class="nav-text">使用全文本搜索</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%AF%E7%94%A8%E5%85%A8%E6%96%87%E6%9C%AC%E6%90%9C%E7%B4%A2%E6%94%AF%E6%8C%81"><span class="nav-text">启用全文本搜索支持</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%9B%E8%A1%8C%E5%85%A8%E6%96%87%E6%9C%AC%E6%90%9C%E7%B4%A2"><span class="nav-text">进行全文本搜索</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%9F%A5%E8%AF%A2%E6%89%A9%E5%B1%95"><span class="nav-text">使用查询扩展</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%83%E5%B0%94%E6%96%87%E6%9C%AC%E6%90%9C%E7%B4%A2"><span class="nav-text">布尔文本搜索</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%A8%E6%96%87%E6%9C%AC%E6%90%9C%E7%B4%A2%E7%9A%84%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E"><span class="nav-text">全文本搜索的使用说明</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E6%95%B0%E6%8D%AE"><span class="nav-text">插入数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%8F%92%E5%85%A5"><span class="nav-text">数据插入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E5%AE%8C%E6%95%B4%E7%9A%84%E8%A1%8C"><span class="nav-text">插入完整的行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E5%A4%9A%E4%B8%AA%E8%A1%8C"><span class="nav-text">插入多个行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E6%A3%80%E7%B4%A2%E5%87%BA%E7%9A%84%E6%95%B0%E6%8D%AE"><span class="nav-text">插入检索出的数据</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0%E5%92%8C%E5%88%A0%E9%99%A4%E6%95%B0%E6%8D%AE"><span class="nav-text">更新和删除数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0%E6%95%B0%E6%8D%AE"><span class="nav-text">更新数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E6%95%B0%E6%8D%AE"><span class="nav-text">删除数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0%E5%92%8C%E5%88%A0%E9%99%A4%E7%9A%84%E6%8C%87%E5%AF%BC%E5%8E%9F%E5%88%99"><span class="nav-text">更新和删除的指导原则</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%92%8C%E6%93%8D%E7%BA%B5%E8%A1%A8"><span class="nav-text">创建和操纵表</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E8%A1%A8"><span class="nav-text">创建表</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A1%A8%E5%88%9B%E5%BB%BA%E5%9F%BA%E7%A1%80"><span class="nav-text">表创建基础</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8NULL%E5%80%BC"><span class="nav-text">使用NULL值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BB%E9%94%AE%E5%86%8D%E4%BB%8B%E7%BB%8D"><span class="nav-text">主键再介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8AUTO-INCREMENT"><span class="nav-text">使用AUTO_INCREMENT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8C%87%E5%AE%9A%E9%BB%98%E8%AE%A4%E5%80%BC"><span class="nav-text">指定默认值</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%95%E6%93%8E%E7%B1%BB%E5%9E%8B"><span class="nav-text">引擎类型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0%E8%A1%A8"><span class="nav-text">更新表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E8%A1%A8"><span class="nav-text">删除表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%87%8D%E5%91%BD%E5%90%8D%E8%A1%A8"><span class="nav-text">重命名表</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%A7%86%E5%9B%BE"><span class="nav-text">使用视图</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%86%E5%9B%BE"><span class="nav-text">视图</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BD%BF%E7%94%A8%E8%A7%86%E5%9B%BE"><span class="nav-text">为什么使用视图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A7%86%E5%9B%BE%E7%9A%84%E8%A7%84%E5%88%99%E5%92%8C%E9%99%90%E5%88%B6"><span class="nav-text">视图的规则和限制</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%A7%86%E5%9B%BE-1"><span class="nav-text">使用视图</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A9%E7%94%A8%E8%A7%86%E5%9B%BE%E7%AE%80%E5%8C%96%E5%A4%8D%E6%9D%82%E7%9A%84%E8%81%94%E7%BB%93"><span class="nav-text">利用视图简化复杂的联结</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E8%A7%86%E5%9B%BE%E9%87%8D%E6%96%B0%E6%A0%BC%E5%BC%8F%E5%8C%96%E6%A3%80%E7%B4%A2%E5%87%BA%E7%9A%84%E6%95%B0%E6%8D%AE"><span class="nav-text">用视图重新格式化检索出的数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%94%A8%E8%A7%86%E5%9B%BE%E8%BF%87%E6%BB%A4%E4%B8%8D%E6%83%B3%E8%A6%81%E7%9A%84%E6%95%B0%E6%8D%AE"><span class="nav-text">用视图过滤不想要的数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%A7%86%E5%9B%BE%E4%B8%8E%E8%AE%A1%E7%AE%97%E5%AD%97%E6%AE%B5"><span class="nav-text">使用视图与计算字段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9B%B4%E6%96%B0%E8%A7%86%E5%9B%BE"><span class="nav-text">更新视图</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B"><span class="nav-text">使用存储过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B"><span class="nav-text">存储过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E4%BD%BF%E7%94%A8%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B"><span class="nav-text">为什么要使用存储过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B-1"><span class="nav-text">使用存储过程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B"><span class="nav-text">创建存储过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B"><span class="nav-text">删除存储过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%8F%82%E6%95%B0"><span class="nav-text">使用参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E6%99%BA%E8%83%BD%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B"><span class="nav-text">建立智能存储过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A3%80%E6%9F%A5%E5%AD%98%E5%82%A8%E8%BF%87%E7%A8%8B"><span class="nav-text">检查存储过程</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%B8%B8%E6%A0%87"><span class="nav-text">使用游标</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B8%B8%E6%A0%87"><span class="nav-text">游标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%B8%B8%E6%A0%87-1"><span class="nav-text">使用游标</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E6%B8%B8%E6%A0%87"><span class="nav-text">创建游标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%93%E5%BC%80%E5%92%8C%E5%85%B3%E9%97%AD%E6%B8%B8%E6%A0%87"><span class="nav-text">打开和关闭游标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E6%B8%B8%E6%A0%87%E6%95%B0%E6%8D%AE"><span class="nav-text">使用游标数据</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%A7%A6%E5%8F%91%E5%99%A8"><span class="nav-text">使用触发器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A6%E5%8F%91%E5%99%A8"><span class="nav-text">触发器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E8%A7%A6%E5%8F%91%E5%99%A8"><span class="nav-text">创建触发器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E8%A7%A6%E5%8F%91%E5%99%A8"><span class="nav-text">删除触发器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%A7%A6%E5%8F%91%E5%99%A8-1"><span class="nav-text">使用触发器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#INSERT%E8%A7%A6%E5%8F%91%E5%99%A8"><span class="nav-text">INSERT触发器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DELETE%E8%A7%A6%E5%8F%91%E5%99%A8"><span class="nav-text">DELETE触发器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#UPDATE%E8%A7%A6%E5%8F%91%E5%99%A8"><span class="nav-text">UPDATE触发器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E4%BA%8E%E8%A7%A6%E5%8F%91%E5%99%A8%E7%9A%84%E8%BF%9B%E4%B8%80%E6%AD%A5%E4%BB%8B%E7%BB%8D"><span class="nav-text">关于触发器的进一步介绍</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%AE%A1%E7%90%86%E4%BA%8B%E5%8A%A1%E5%A4%84%E7%90%86"><span class="nav-text">管理事务处理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8B%E5%8A%A1%E5%A4%84%E7%90%86"><span class="nav-text">事务处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%A7%E5%88%B6%E4%BA%8B%E5%8A%A1%E5%A4%84%E7%90%86"><span class="nav-text">控制事务处理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8ROLLBACK"><span class="nav-text">使用ROLLBACK</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8COMMIT"><span class="nav-text">使用COMMIT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E4%BF%9D%E7%95%99%E7%82%B9"><span class="nav-text">使用保留点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9B%B4%E6%94%B9%E9%BB%98%E8%AE%A4%E7%9A%84%E6%8F%90%E4%BA%A4%E8%A1%8C%E4%B8%BA"><span class="nav-text">更改默认的提交行为</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%A8%E7%90%83%E5%8C%96%E5%92%8C%E6%9C%AC%E5%9C%B0%E5%8C%96"><span class="nav-text">全球化和本地化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%97%E7%AC%A6%E9%9B%86%E5%92%8C%E6%A0%A1%E5%AF%B9%E9%A1%BA%E5%BA%8F"><span class="nav-text">字符集和校对顺序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%AD%97%E7%AC%A6%E9%9B%86%E5%92%8C%E6%A0%A1%E5%AF%B9%E9%A1%BA%E5%BA%8F"><span class="nav-text">使用字符集和校对顺序</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AE%89%E5%85%A8%E7%AE%A1%E7%90%86"><span class="nav-text">安全管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BF%E9%97%AE%E6%8E%A7%E5%88%B6"><span class="nav-text">访问控制</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AE%A1%E7%90%86%E7%94%A8%E6%88%B7"><span class="nav-text">管理用户</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E7%94%A8%E6%88%B7%E8%B4%A6%E5%8F%B7"><span class="nav-text">创建用户账号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E7%94%A8%E6%88%B7%E8%B4%A6%E5%8F%B7"><span class="nav-text">删除用户账号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE%E8%AE%BF%E9%97%AE%E6%9D%83%E9%99%90"><span class="nav-text">设置访问权限</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9B%B4%E6%94%B9%E5%8F%A3%E4%BB%A4"><span class="nav-text">更改口令</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BB%B4%E6%8A%A4"><span class="nav-text">数据库维护</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%87%E4%BB%BD%E6%95%B0%E6%8D%AE"><span class="nav-text">备份数据</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E8%A1%8C%E6%95%B0%E6%8D%AE%E5%BA%93%E7%BB%B4%E6%8A%A4"><span class="nav-text">进行数据库维护</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%8A%E6%96%AD%E5%90%AF%E5%8A%A8%E9%97%AE%E9%A2%98"><span class="nav-text">诊断启动问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6"><span class="nav-text">查看日志文件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%94%B9%E5%96%84%E6%80%A7%E8%83%BD"><span class="nav-text">改善性能</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%94%B9%E5%96%84%E6%80%A7%E8%83%BD-1"><span class="nav-text">改善性能</span></a></li></ol></li></ol>
 
     </div>
 </div>
