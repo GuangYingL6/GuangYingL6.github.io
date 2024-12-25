@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="计算机 编程 网络 操作系统">
+    
+    <meta name="author" content="GuangYing">
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://guangying.com/2024/12/25/简单tcp客户服务器相关/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+        <meta name="description" content="TCP客户&#x2F;服务器简单程序所引发一些问题">
+<meta property="og:type" content="article">
+<meta property="og:title" content="简单TCP客户服务器相关">
+<meta property="og:url" content="http://guangying.com/2024/12/25/%E7%AE%80%E5%8D%95TCP%E5%AE%A2%E6%88%B7%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9B%B8%E5%85%B3/index.html">
+<meta property="og:site_name" content="记事本">
+<meta property="og:description" content="TCP客户&#x2F;服务器简单程序所引发一些问题">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-12-25T12:33:17.000Z">
+<meta property="article:modified_time" content="2024-12-25T12:35:15.746Z">
+<meta property="article:author" content="GuangYing">
+<meta property="article:tag" content="编程">
+<meta property="article:tag" content="网络">
+<meta property="article:tag" content="UNIX">
+<meta name="twitter:card" content="summary">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/img/ico.jpg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/ico.jpg">
+    <meta name="theme-color" content="#429ce3">
+    <link rel="shortcut icon" href="/img/ico.jpg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            简单TCP客户服务器相关 -
+        
+        芝士博客
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/assets/build/styles.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"guangying.com","root":"/","language":"zh-CN"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":true,"auto":false,"list":[]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"tokyo-night-dark"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":6,"number":false,"expand":true,"init_open":true},"copyright":{"enable":true,"default":"cc_by_nc_sa"},"lazyload":true,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#429ce3","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":false,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":true},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"open_graph":true,"google_analytics":{"enable":false,"id":null}},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/wallhaven-wqery6-light.webp","dark":"/images/wallhaven-wqery6-dark.webp"},"title":"去码头搞点芝士","subtitle":{"text":["饿了","我补药吃拼好饭啊啊啊啊啊"],"hitokoto":{"enable":false,"show_author":false,"api":"https://v1.hitokoto.cn"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"style":"default","links":{"github":null,"instagram":null,"zhihu":null,"twitter":null,"email":null,"fa-brands fa-github":"https://github.com/GuangYingL6","fa-solid fa-envelope":"mailto:692466332@qq.com"},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":false,"version":"9.3.0"}},"version":"2.7.1","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"GitHub":{"path":"https://github.com/GuangYingL6","icon":"fa-brands fa-github"},"Google":{"path":"https://www.google.com/","icon":"fa-brands fa-google"},"友链":{"path":"/links/","icon":"fa-solid fa-link"}},"search":{"enable":false,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"blur"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":"我宣布个事啊","show_on_mobile":true,"links":{"档案":{"path":"/archives","icon":"fa-regular fa-archive"},"标签":{"path":"/tags","icon":"fa-regular fa-tags"},"分类":{"path":"/categories","icon":"fa-regular fa-folder"}}},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2024/10/17 11:45:14"};
+    window.lang_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+
+    
+        <span class="pjax-progress-bar"></span>
+<!--        <span class="swup-progress-icon">-->
+<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+<!--        </span>-->
+    
+</div>
+
+
+
+<main class="page-container" id="swup">
+
+    
+
+    <div class="main-content-container">
+
+
+        <div class="main-content-header">
+            <header class="navbar-container px-6 md:px-12">
+
+    <div class="navbar-content ">
+        <div class="left">
+            
+                <a class="logo-image" href="/">
+                    <img src="/img/ico.jpg">
+                </a>
+            
+            <a class="logo-title" href="/">
+                
+                芝士博客
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    首页
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   target="_blank" rel="noopener" href="https://github.com/GuangYingL6"
+                                        >
+                                    <i class="fa-brands fa-github fa-fw"></i>
+                                    GITHUB
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   target="_blank" rel="noopener" href="https://www.google.com/"
+                                        >
+                                    <i class="fa-brands fa-google fa-fw"></i>
+                                    GOOGLE
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/links/"
+                                        >
+                                    <i class="fa-solid fa-link fa-fw"></i>
+                                    友链
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-screen w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                首页
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           target="_blank" rel="noopener" href="https://github.com/GuangYingL6"
+                        >
+                            <span>
+                                GITHUB
+                            </span>
+                            
+                                <i class="fa-brands fa-github fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           target="_blank" rel="noopener" href="https://www.google.com/"
+                        >
+                            <span>
+                                GOOGLE
+                            </span>
+                            
+                                <i class="fa-brands fa-google fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/links/"
+                        >
+                            <span>
+                                友链
+                            </span>
+                            
+                                <i class="fa-solid fa-link fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+                
+                    
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full active"
+                           href="/archives"
+                        >
+                            <span>档案</span>
+                            <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                        </a>
+                    </li>
+                
+                    
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full active"
+                           href="/tags"
+                        >
+                            <span>标签</span>
+                            <i class="fa-regular fa-tags fa-sm fa-fw"></i>
+                        </a>
+                    </li>
+                
+                    
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full active"
+                           href="/categories"
+                        >
+                            <span>分类</span>
+                            <i class="fa-regular fa-folder fa-sm fa-fw"></i>
+                        </a>
+                    </li>
+                
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">7</div>
+        <div class="label text-third-text-color text-sm">标签</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">3</div>
+        <div class="label text-third-text-color text-sm">分类</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">6</div>
+        <div class="label text-third-text-color text-sm">文章</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="main-content-body">
+
+            
+
+            <div class="main-content">
+
+                
+                    <div class="post-page-container flex relative justify-between box-border w-full h-full">
+    <div class="article-content-container">
+
+        <div class="article-title relative w-full">
+            
+                <div class="w-full flex items-center pt-6 justify-start">
+                    <h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">简单TCP客户服务器相关</h1>
+                </div>
+            
+            </div>
+
+        
+            <div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+                <div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+                    <img src="/img/avat.jpg">
+                </div>
+                <div class="info flex flex-col justify-between">
+                    <div class="author flex items-center">
+                        <span class="name text-default-text-color text-lg font-semibold">GuangYing</span>
+                        
+                            <span class="author-label ml-1.5 text-xs px-2 py-0.5 rounded-small text-third-text-color border border-shadow-color-1">Lv1</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2024-12-25 20:33:17</span>
+        <span class="mobile">2024-12-25 20:33:17</span>
+        <span class="hover-info">创建</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2024-12-25 20:35:15</span>
+            <span class="mobile">2024-12-25 20:35:15</span>
+            <span class="hover-info">更新</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/%E7%BD%91%E7%BB%9C/">网络</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/%E7%BC%96%E7%A8%8B/">编程</a>&nbsp;
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/%E7%BD%91%E7%BB%9C/">网络</a>&nbsp;
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/UNIX/">UNIX</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        
+
+
+        <div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+            <h1 id="POSIX信号处理"><a href="#POSIX信号处理" class="headerlink" title="POSIX信号处理"></a>POSIX信号处理</h1><p>信号：告知某个进程发生了某个事件的通知，有时也称为<strong>软件中断</strong><br>信号通常是异步发生的，即进程预先不知道信号的准确发生时刻</p>
+<p>信号可以：</p>
+<ul>
+<li>由一个进程发给另一个进程(或自身)</li>
+<li>由内核发给某个进程</li>
+</ul>
+<p>每个信号都有一个与之关联的<strong>处置</strong>，也称<strong>行为</strong><br>通过调用sigaction函数来设定一个信号的处理，并有三种选择</p>
+<ul>
+<li>可以提供一个函数，只要有特定信号发生它就被调用<ul>
+<li>这样的函数称为<strong>信号处理函数</strong></li>
+<li>这种行为称为<strong>捕获</strong>信号</li>
+<li>有两个信号不能被捕获<ul>
+<li>SIGKILL和SIGSTOP</li>
+</ul>
+</li>
+<li>信号处理函数由信号值这个单一的整数参数来调用，且没有返回值，其函数原型因此如下：<ul>
+<li><code>void handler(int signo);</code></li>
+</ul>
+</li>
+<li>对于大多数信号，调用sigaction函数并指定发生时所调用的函数即可</li>
+<li>但SIGIO、SIGPOLL、SIGURG等个别信号还需要捕获它们的进程做些其他额外工作</li>
+</ul>
+</li>
+<li>可以把某个信号的处置设定为SIG_IGN来<strong>忽略</strong>它<ul>
+<li>SIGKILL和SIGSTOP这两个信号不能被忽略</li>
+</ul>
+</li>
+<li>可以把某个信号的处置设定为SIG_DFL来启用它的<strong>默认</strong>处置<ul>
+<li>默认处置通常是在收到信号后终止进程，其中某些信号还在当前工作目录产生一个进程的核心映像(也称为内存映像)</li>
+<li>另有个别信号的默认处置是忽略的，SIGCHLD和SIGURG(带外数据到达时发送)等</li>
+</ul>
+</li>
+</ul>
+<h2 id="signal函数"><a href="#signal函数" class="headerlink" title="signal函数"></a><strong>signal</strong>函数</h2><p>此处以所期望的PISIX语义提供了一个简单接口</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;unp.h&quot;</span><br><span class="line"></span><br><span class="line">Sigfunc *</span><br><span class="line">signal(int signo, Sigfunc *func)</span><br><span class="line">&#123;</span><br><span class="line">	struct sigactionact, oact;</span><br><span class="line"></span><br><span class="line">	act.sa_handler = func;</span><br><span class="line">	sigemptuset(&amp;act.sa_mask);</span><br><span class="line">	act.sa_flags = 0;</span><br><span class="line">	if (signo == SIGALRM) &#123;</span><br><span class="line">#ifdef SA_INTERRUPT</span><br><span class="line">		act.sa_flags |= SA_INTERRUPT; /* SunOS 4.x */</span><br><span class="line">#endif</span><br><span class="line">	&#125; else &#123;</span><br><span class="line">#ifdef SA_RESTART</span><br><span class="line">		act.sa_flags |= SA_RESTART; /* SVR4, 4.4BSD */</span><br><span class="line">#endif</span><br><span class="line">	&#125;</span><br><span class="line">	if (sigaction(signo, &amp;act, &amp;oact) &lt; 0)</span><br><span class="line">		return(SIG_ERR);</span><br><span class="line">	return(oact.sa_handler);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>用typedef简化函数原型<br><code>void (*signal(int signo, void (*func)(int)))(int);</code><br>定义：<code>typedef void Sigfunc(int);</code><br>原型于是变为：<br><code>Sigfunc *signal(int signo, Sigfunc *func);</code><br>该函数的第二个参数和返回值都是指向信号处理函数的指针</p>
+<p>设置处理函数</p>
+<ul>
+<li>sigaction结构的sa_handler成员被置为func参数</li>
+</ul>
+<p>设置处理函数的信号掩码</p>
+<ul>
+<li>POSIX允许指定一组信号：在信号处理函数被调用时阻塞<ul>
+<li>任何阻塞的信号都不能<strong>提交</strong>给进程</li>
+<li>把sa_mask成员设置为空集，即运行此处理函数期间，不阻塞额外的信号</li>
+<li>POSIX保证被捕获的信号在其信号处理函数运行期间总是阻塞的</li>
+</ul>
+</li>
+</ul>
+<p>设置SA_RESTART标志</p>
+<ul>
+<li>SA_RESTART标志是可选的<ul>
+<li>如果设置，由相应信号中断的系统调用将由内核自动重启</li>
+<li>如果被捕获的信号不是SIGALRM且SA_RESTART有定义，就设置该标志</li>
+<li>对SIGALRM特殊处理的原因是，为I&#x2F;O操作设置超时，此时希望受阻塞的系统调用被该信号中断掉</li>
+</ul>
+</li>
+<li>一些早期系统(如SunOS 4.x)默认设置成自动重启被中断的系统调用，并定义了与SA_RESTART互补的SA_INTERRUPT标志<ul>
+<li>如果定义了该标志，就在被捕获的信号是SIGALRM时设置它</li>
+</ul>
+</li>
+</ul>
+<h2 id="POSIX信号语义"><a href="#POSIX信号语义" class="headerlink" title="POSIX信号语义"></a>POSIX信号语义</h2><ul>
+<li>一旦安装了信号处理函数，便一直安装着</li>
+<li>在一个信号处理函数运行期间，正被递交的信号是阻塞的<ul>
+<li>且安装处理函数时在传递给sigaction函数的sa_mask信号集中指定的任何额外信号也被阻塞</li>
+<li>将sa_mask置为空集，意味着除了被捕获的信号外，没有额外信号被阻塞</li>
+</ul>
+</li>
+<li>如果一个信号在被阻塞期间产生了一次或多次，那么该信号被解阻塞之后通常只提交一次<ul>
+<li>即Unix信号<strong>默认</strong>是不排队的</li>
+</ul>
+</li>
+<li>利用sigprocmask函数选择性的阻塞或解阻塞一组信号是可能的<ul>
+<li>这使得可以做到在一段临界区代码执行期间，防止捕获某些信号，以此保护这段代码</li>
+</ul>
+</li>
+</ul>
+<h1 id="处理SIGCHLD信号"><a href="#处理SIGCHLD信号" class="headerlink" title="处理SIGCHLD信号"></a>处理SIGCHLD信号</h1><p>设置僵死(zombie)状态的目的是维护子进程的信息，以便父进程在以后某个时候获取<br>信息包括子进程的进程ID、终止状态、资源利用信息等</p>
+<p>如果一个进程终止，而该进程有子进程处于僵死状态，则它的所有僵死子进程的父进程ID将被重置为1(init进程)<br>    继承这些子进程的init进程将清理它们<br>有些Unix系统在ps命令输出的COMMAND栏以<code>&lt;defunct&gt;</code>指明僵死进程</p>
+<h2 id="处理僵死进程"><a href="#处理僵死进程" class="headerlink" title="处理僵死进程"></a>处理僵死进程</h2><p>僵死进程占用内核空间，最终可能导致耗尽进程资源<br>为此建立一个俘获SIGCHLD信号的信号处理函数，在函数体中调用wait</p>
+<p>处理僵死进程的可移植方法：捕获SIGCHLD，并调用wait或waitpid</p>
+<p>在父进程阻塞与慢系统调用(accept)时由父进程捕获，内核就会使accept返回一个EINTR错误(被中断的系统调用)，而父进程不处理该错误，于是终止</p>
+<p>在Solaris 9环境下的特定例子中，标准C库函数中提供的signal函数标志不会使内核自动重启被中断的系统调用</p>
+<ul>
+<li>即在自定义的signal中设置的SA_RESTART标志在系统函数库的signal函数中并没有设置<br>而另有些系统自动重启被中断的系统调用</li>
+</ul>
+<h2 id="处理被中断的系统调用"><a href="#处理被中断的系统调用" class="headerlink" title="处理被中断的系统调用"></a>处理被中断的系统调用</h2><p>适用于慢系统调用的基本规则是：当阻塞与某个慢系统调用的一个进程捕获某个信号且相应信号处理函数返回时，该系统调用可能返回一个EINTR错误<br>有些内核自动重启某些被中断的系统调用<br>不过为了便于移植，当编写捕获信号的程序时(多数并发服务器捕获SIGCHLD)，必须对慢系统调用返回EINTR有所准备</p>
+<p>为了处理被中断的accept，进行一些改动</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">for ( ; ; ) &#123;</span><br><span class="line">	clilen = sizeof(cliaddr);</span><br><span class="line">	if ((connfd = accept(listenfd, (SA *) &amp;cliaddr, &amp;clilen)) &lt; 0) &#123;</span><br><span class="line">		if (errno == EINTR)</span><br><span class="line">			continue;</span><br><span class="line">		else</span><br><span class="line">			err_sys(&quot;accept error&quot;);</span><br><span class="line">	&#125;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>该代码自己重启被中断的系统调用<br>对accept、read、write、select、open等函数合适<br>但connect不能重启</p>
+<ul>
+<li>如果该函数返回EINTR，就不能再次调用它，否则将立即返回一个错误</li>
+<li>当connect被一个捕获的信号中断而且不自动重启时，必须调用select来等待连接完成</li>
+</ul>
+<h1 id="wait和waitpid函数"><a href="#wait和waitpid函数" class="headerlink" title="wait和waitpid函数"></a><code>wait</code>和<code>waitpid</code>函数</h1><p>用来处理已终止的子进程</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys/wait.h&gt;</span><br><span class="line">pid_t wait(int *statloc);</span><br><span class="line">pid_t waitpid(pid_t pid, int *statloc, int options);</span><br><span class="line">均返回：若成功则为进程ID，若出错则为0或-1</span><br></pre></td></tr></table></figure></div>
+<p>均返回已终止子进程的进程ID号<br>通过statloc指针返回子进程终止状态(一个整数)</p>
+<p>可以调用三个宏来检查终止状态，并判别子进程是正常终止、由某个信号杀死、由某个信号杀死还是仅仅由作业控制停止而已<br>另有些宏用于接着获取子进程的退出状态、杀死子进程的信号值或停止子进程的作业控制信号值</p>
+<p>若调用wait的进程没有已终止的子进程，不过有一个或多个子进程仍在执行，那么wait将阻塞到现有子进程第一个终止为止</p>
+<p>waitpid函数就等待哪个进程以及是否阻塞给了更多的控制</p>
+<ul>
+<li>pid参数允许指定想等待的进程ID</li>
+<li>值-1表示等待第一个终止的子进程(还有些处理进程组ID的可选值)</li>
+<li>options参数允许指定附加选项<ul>
+<li>最常用的选项是WNOHANG，它告知内核在没有已终止子进程时不要阻塞</li>
+</ul>
+</li>
+</ul>
+<h2 id="函数wait和waitpid的区别"><a href="#函数wait和waitpid的区别" class="headerlink" title="函数wait和waitpid的区别"></a>函数wait和waitpid的区别</h2><p>如果多个信号都在信号处理函数执行前产生，而信号处理函数只执行一次，因为Unix信号一般是不排队的，此问题是不确定的，指不定执行几次:)</p>
+<p>正确的解决办法是调用waitpid而不是wait<br>在一个循环内调用waitpid以获取所有已终止子进程的状态<br>必须指定WNOHANG选项，告知waitpid在尚有未终止的子进程在运行时不要阻塞<br>    不能在循环内调用wait，因为没办法防止wait在正运行的子进程中尚有未终止时阻塞</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;unp.h&quot;</span><br><span class="line">void</span><br><span class="line">sig_chld(int signo)</span><br><span class="line">&#123;</span><br><span class="line">	pid_t pid;</span><br><span class="line">	int stat;</span><br><span class="line">	while ((pid = waitpid(-1, &amp;stat, WNOHANG)) &gt; 0)</span><br><span class="line">		printf(&quot;child %d terminated\n&quot;, pid);</span><br><span class="line">	return;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>最终版本，能正确处理accept返回的EINTR，并建立一个给所有已终止子进程调用waitpid的信号处理函数</p>
+<p>在网络编程时可能会遇到三种情况</p>
+<ul>
+<li>当fork子进程时，必须捕获SIGCHLD信号</li>
+<li>当捕获信号时，必须处理被中断的系统调用</li>
+<li>SIGCHLD的信号处理函数必须正确编写，应使用waitpid函数以免留下僵死进程</li>
+</ul>
+<h1 id="accept返回前连接中止"><a href="#accept返回前连接中止" class="headerlink" title="accept返回前连接中止"></a>accept返回前连接中止</h1><p>另一种情况也能导致accept返回一个非致命的错误，此时只需要再次调用accept</p>
+<p>在三路握手完成从而连接建立之后，客户TCP缺发送了一个RST(复位)<br>在服务器看来，就在该连接已由TCP排队，等着服务器进程调用accept时RST到达<br>稍后，服务器进程调用accept</p>
+<p>如何处理这种中止的连接依赖于不同的实现<br>源自Berkeley的实现完全在内核中处理中止的链接，服务器进程根本看不到<br>而大多数SVR4实现返回一个错误给服务器进程，不过错误本身取决于实现</p>
+<h1 id="服务器进程终止"><a href="#服务器进程终止" class="headerlink" title="服务器进程终止"></a>服务器进程终止</h1><p>当服务器先于客户端终止时(kill)</p>
+<ul>
+<li>子进程中所有打开的描述符都被关闭，导致向客户发送一个FIN，而客户TCP相应一个ACK<ul>
+<li>这是TCP连接终止工作的前半部分</li>
+</ul>
+</li>
+<li>SIGCHLD信号被发送给服务器父进程，并得到正确处理</li>
+<li>客户端无事发生<ul>
+<li>客户TCP接收来自服务器TCP的FIN并相应一个ACK</li>
+<li>然而问题是：客户进程阻塞在fgets调用上，等待从终端接受一行文本</li>
+</ul>
+</li>
+<li>此时，在客户上键入一行文本<ul>
+<li>调用writen，客户TCP把数据发送给服务器<ul>
+<li>TCP允许这么做，因为客户TCP接收到FIN只表示服务器进程已关闭了连接的服务器端，从而不在往其中发送任何数据而已</li>
+<li>FIN的接收并没有告知客户TCP服务器进程已经终止(即使确实已经终止了)</li>
+</ul>
+</li>
+<li>当服务器TCP接受到来自客户的数据时<ul>
+<li>先前打开的套接字进程已经终止</li>
+<li>于是相应一个RST</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>然而客户进程看不到这个RST<ul>
+<li>因为此时它在调用writen后立即调用readline</li>
+<li>并且由于之前接收的FIN，所调用的readline立即返回0(表示EOF)</li>
+<li>客户此时并未预期收到EOF</li>
+<li>于是以错误信息<code>server terminated prematurely</code>(服务器过早终止)退出</li>
+<li>当客户终止时，所有打开的描述符都被关闭</li>
+</ul>
+</li>
+</ul>
+<p>上述例子还取决于时序，客户调用readline可能发生在服务器的RST被客户收到之前，也可能发生在收到之后</p>
+<ul>
+<li>如果readline发生在收到RST之前(上述例子所示)，那么结果是客户得到一个未预期的EOF</li>
+<li>否则结果是由readline返回一个ECONNRESET(<code>connection reset by peer</code>，对方复位连接错误)</li>
+</ul>
+<p>当FIN到达套接字时，客户正阻塞在fgets调用上<br>客户实际上在应对两个描述符：套接字和用户输入，不能单纯阻塞在这两个元中某个特定源的输入上，而是应该阻塞在其中任何一个源的输入上</p>
+<ul>
+<li>是select和poll这两个函数的目的之一<br>使用这个函数编写客户端程序，使得一旦杀死服务器子进程，客户就会立即被告知接收到FIN</li>
+</ul>
+<h1 id="SIGPIPE信号"><a href="#SIGPIPE信号" class="headerlink" title="SIGPIPE信号"></a>SIGPIPE信号</h1><p>客户可能在读回任何数据之前执行两次针对服务器的写操作，而RST是由其中第一次写操作引发的</p>
+<p>适用于此的规则是：当一个进程向某个已收到RST的套接字执行写操作时，内核向该进程发送一个SIGPIPE信号<br>该信号的默认行为是终止进程，因此进程必须捕获它以免不情愿的被终止</p>
+<p>不论该进程是捕获了该信号并从其信号处理函数返回，还是简单的忽略该信号，写操作都将返回EPIPE错误</p>
+<p>在第一次写操作而不是第二次写操作时捕获该信号是不可能的<br>第一次写操作引发RST，第二次写引发SIGPIPE信号<br>写一个已经接受了FIN的套接字不成问题，但写一个已接收了RST的套接字则是一个错误</p>
+<p>处理SIGIPIE的建议方法取决于它发生时应用进程想做什么</p>
+<ul>
+<li>如果没有特殊的事情要做，那么将该信号处理办法直接设置为SIG_IGN，并假设后续的输出操作将捕捉EPIPE错误并终止</li>
+<li>如果信号出现时采取特殊措施(可能需要在日志文件中登记)，那么就必须捕获该信号，以便在信号处理函数中执行所有期望的动作</li>
+</ul>
+<p>必须注意<br>如果使用了多个套接字，信号的提交无法告诉我们是哪个套接字出的错<br>如果确实需要知道哪个write出了错，那么必须要么不理会该信号，要么从信号处理函数返回后再处理来自write的EPIPE</p>
+<h1 id="服务器主机崩溃"><a href="#服务器主机崩溃" class="headerlink" title="服务器主机崩溃"></a>服务器主机崩溃</h1><p>在向服务器主机发送数据时才能检测出它已经崩溃或不可达<br>若需要不主动向其发送数据也向检测出服务器主机的崩溃，则需采用其他技术：SO_KEEPALIVE套接字选项</p>
+<h2 id="服务器主机崩溃后重启"><a href="#服务器主机崩溃后重启" class="headerlink" title="服务器主机崩溃后重启"></a>服务器主机崩溃后重启</h2><p>服务器主机崩溃后重启时，TCP丢失了崩溃前的所有连接信息，因此服务器TCP对于所有收到的来自客户的数据分节相应一个RST</p>
+<p>客户TCP收到该RST时，客户正阻塞于readline调用，导致该调用返回ECONNRESET错误</p>
+<p>如果对于客户而言检测服务器主机崩溃与否很重要，即使客户不主动发送数据也要能检测出来，就需要采用其他某种技术(如SO_KEEPALIVE套接字选项或某些客户&#x2F;服务器心搏函数)</p>
+<h1 id="服务器主机关机"><a href="#服务器主机关机" class="headerlink" title="服务器主机关机"></a>服务器主机关机</h1><p>Unix系统关机时</p>
+<ul>
+<li>init进程通常先给所有进程发送SIGTERM信号(该信号可被捕获)</li>
+<li>等待一段固定时间(往往5~20秒之间)</li>
+<li>然后给所有仍在运行的进程发送SIGKILL信号(该信号不能被捕获)<br>为了留给所有运行的进程一小段时间用来清除和终止</li>
+</ul>
+<p>如果忽略SIGTERM信号，服务器将由SIGKILL信号终止</p>
+<ul>
+<li>SIGTERM信号默认处置就是终止进程</li>
+<li>所以不捕获也不忽略则进行默认处置，服务器将被SIGTERM信号终止，SIGKILL信号不会在发送给它</li>
+</ul>
+<p>当服务器子进程终止时，所有描述符关闭<br>与之前所述相同，必须在客户中使用select或poll函数，使得服务器进程的终止一经发送，客户就能检测到</p>
+<h1 id="TCP程序小结"><a href="#TCP程序小结" class="headerlink" title="TCP程序小结"></a>TCP程序小结</h1><p>在TCP客户和服务器可以彼此通信之前，每一端都得指定连接的套接字对：</p>
+<ul>
+<li>本地IP地址</li>
+<li>本地端口</li>
+<li>外地IP地址</li>
+<li>外地端口</li>
+</ul>
+<p>从客户的角度，外地IP地址和外地端口必须在客户调用connect时指定，而两个本地值通常就由内核作为connect的一部分来选定</p>
+<p>客户也可以在调用connect之前，通过调用bind来指定其中一个或全部两个本地值<br>不过这种做法并不常见</p>
+<p>客户可以在连接建立后通过调用getsockname获取由内核指定的两个本地值</p>
+<p>服务器的角度来看<br>本地端口(服务器的众所周知端口)由bind指定</p>
+<ul>
+<li>bind调用中服务器指定的本地IP地址通常是通配IP地址<br>如果服务器在一个多宿主机上绑定通配IP地址，那么它可以在连接建立后通过调用getsockname来确定本地IP地址</li>
+</ul>
+<p>两个外地值由accept调用返回给服务器</p>
+<p>如果另一个程序由调用accept的服务器通过调用exec来执行，那么这个新程序可以在必要时调用getpeername来确定客户的IP地址和端口号</p>
+<h1 id="数据格式"><a href="#数据格式" class="headerlink" title="数据格式"></a>数据格式</h1><p>一般来说，必须关心在客户和服务器之间进行交换的数据格式</p>
+<h2 id="在客户与服务器之间传递文本串"><a href="#在客户与服务器之间传递文本串" class="headerlink" title="在客户与服务器之间传递文本串"></a>在客户与服务器之间传递文本串</h2><p>若服务器期望从客户读入的文本行包含由空格分开的两个整数，服务器将返回两个整数的和</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">for ( ; ; ) &#123;</span><br><span class="line">	if ((n = Readline(sockfd, line, MAXLINE)) == 0)</span><br><span class="line">		return;</span><br><span class="line">	if (sscanf(line, &quot;%ld%ld&quot;, &amp;arg1, &amp;arg2) == 2)</span><br><span class="line">		snprintf(line, sizeof(line), &quot;%ld\n&quot;, arg1 + arg2);</span><br><span class="line">	else</span><br><span class="line">		snprintf(line, sizeof(line), &quot;input error\n&quot;);</span><br><span class="line">	n = strlen(line);</span><br><span class="line">	Writen(sockfd, line, n);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>调用sscanf把本文串中的参数转换为长整数，然后调用snprintf把结果转换为文本串</p>
+<h2 id="在客户与服务器之间传递二进制结构"><a href="#在客户与服务器之间传递二进制结构" class="headerlink" title="在客户与服务器之间传递二进制结构"></a>在客户与服务器之间传递二进制结构</h2><p>当这样的客户和服务器程序运行在字节序不同或支持长整数大小不一致的两个主机上时，工作将失常</p>
+<ul>
+<li>不同的实现以不同的格式存储二进制数<ul>
+<li>最常见的如大端字节序与小端字节序</li>
+</ul>
+</li>
+<li>不同的实现在存储相同的C数据类型上可能存在差异<ul>
+<li>比如长整数位数不一定相同</li>
+</ul>
+</li>
+<li>不同的实现给结构打包的方式存在差异<ul>
+<li>取决于各种数据类型所用的位数以及机器的对其限制</li>
+<li>因此穿越套接字传递二进制结构绝对不是明智的</li>
+</ul>
+</li>
+</ul>
+<p>解决这种数据格式问题有两个常用方法：</p>
+<ul>
+<li>把所有的数值数据作为文本串来传递<ul>
+<li>这里假设客户和服务器主机具有相同的字符集</li>
+</ul>
+</li>
+<li>显示定义所支持数据类型的二进制格式(位数、大端或小端字节序)，并以这样的格式在客户与服务器之间传递所有数据<ul>
+<li>远程过程调用(RPC)软件包通常使用这种技术</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+
+        
+            <div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+                <div class="article-copyright-info-container">
+    <ul>
+        <li><strong>标题:</strong> 简单TCP客户服务器相关</li>
+        <li><strong>作者:</strong> GuangYing</li>
+        <li><strong>创建于
+                :</strong> 2024-12-25 20:33:17</li>
+        
+            <li>
+                <strong>更新于
+                    :</strong> 2024-12-25 20:35:15
+            </li>
+        
+        <li>
+            <strong>链接:</strong> http://quebo.cn/2024/12/25/简单TCP客户服务器相关/
+        </li>
+        <li>
+            <strong>
+                版权声明:
+            </strong>
+            
+
+            
+                本文章采用 <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a> 进行许可。
+            
+        </li>
+    </ul>
+</div>
+
+            </div>
+        
+
+        
+            <ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
+                
+                    <li class="tag-item mx-0.5">
+                        <a href="/tags/%E7%BC%96%E7%A8%8B/">#编程</a>&nbsp;
+                    </li>
+                
+                    <li class="tag-item mx-0.5">
+                        <a href="/tags/%E7%BD%91%E7%BB%9C/">#网络</a>&nbsp;
+                    </li>
+                
+                    <li class="tag-item mx-0.5">
+                        <a href="/tags/UNIX/">#UNIX</a>&nbsp;
+                    </li>
+                
+            </ul>
+        
+
+        
+
+        
+            <div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+                
+                
+                    <div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+                        <a class="next"
+                        rel="next"
+                        href="/2024/12/25/%E5%9F%BA%E6%9C%ACTCP%E5%A5%97%E6%8E%A5%E5%AD%97%E7%BC%96%E7%A8%8B/"
+                        >
+                            <span class="title flex justify-center items-center">
+                                <span class="post-nav-title-item">基本TCP套接字编程</span>
+                                <span class="post-nav-item">下一篇</span>
+                            </span>
+                            <span class="right arrow-icon flex justify-center items-center">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+
+        
+    </div>
+
+    
+        <div class="toc-content-container">
+            <div class="post-toc-wrap">
+    <div class="post-toc">
+        <div class="toc-title">目录</div>
+        <div class="page-title">简单TCP客户服务器相关</div>
+        <ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#POSIX%E4%BF%A1%E5%8F%B7%E5%A4%84%E7%90%86"><span class="nav-text">POSIX信号处理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#signal%E5%87%BD%E6%95%B0"><span class="nav-text">signal函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#POSIX%E4%BF%A1%E5%8F%B7%E8%AF%AD%E4%B9%89"><span class="nav-text">POSIX信号语义</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%84%E7%90%86SIGCHLD%E4%BF%A1%E5%8F%B7"><span class="nav-text">处理SIGCHLD信号</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E5%83%B5%E6%AD%BB%E8%BF%9B%E7%A8%8B"><span class="nav-text">处理僵死进程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%A4%84%E7%90%86%E8%A2%AB%E4%B8%AD%E6%96%AD%E7%9A%84%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="nav-text">处理被中断的系统调用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#wait%E5%92%8Cwaitpid%E5%87%BD%E6%95%B0"><span class="nav-text">wait和waitpid函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%BD%E6%95%B0wait%E5%92%8Cwaitpid%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-text">函数wait和waitpid的区别</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#accept%E8%BF%94%E5%9B%9E%E5%89%8D%E8%BF%9E%E6%8E%A5%E4%B8%AD%E6%AD%A2"><span class="nav-text">accept返回前连接中止</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%BF%9B%E7%A8%8B%E7%BB%88%E6%AD%A2"><span class="nav-text">服务器进程终止</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#SIGPIPE%E4%BF%A1%E5%8F%B7"><span class="nav-text">SIGPIPE信号</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%BB%E6%9C%BA%E5%B4%A9%E6%BA%83"><span class="nav-text">服务器主机崩溃</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%BB%E6%9C%BA%E5%B4%A9%E6%BA%83%E5%90%8E%E9%87%8D%E5%90%AF"><span class="nav-text">服务器主机崩溃后重启</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B8%BB%E6%9C%BA%E5%85%B3%E6%9C%BA"><span class="nav-text">服务器主机关机</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#TCP%E7%A8%8B%E5%BA%8F%E5%B0%8F%E7%BB%93"><span class="nav-text">TCP程序小结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E6%A0%BC%E5%BC%8F"><span class="nav-text">数据格式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8%E5%AE%A2%E6%88%B7%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B9%8B%E9%97%B4%E4%BC%A0%E9%80%92%E6%96%87%E6%9C%AC%E4%B8%B2"><span class="nav-text">在客户与服务器之间传递文本串</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9C%A8%E5%AE%A2%E6%88%B7%E4%B8%8E%E6%9C%8D%E5%8A%A1%E5%99%A8%E4%B9%8B%E9%97%B4%E4%BC%A0%E9%80%92%E4%BA%8C%E8%BF%9B%E5%88%B6%E7%BB%93%E6%9E%84"><span class="nav-text">在客户与服务器之间传递二进制结构</span></a></li></ol></li></ol>
+
+    </div>
+</div>
+        </div>
+    
+</div>
+
+
+
+                
+
+            </div>
+
+            
+
+        </div>
+
+        <div class="main-content-footer">
+            <footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+            <div class="customize-info my-1">不再看一会儿吗O.o</div>
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2024</span>
+              -
+            
+            2024&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">GuangYing</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        共撰写了 6 篇文章
+                    </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">访问人数</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">总访问量</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">由 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a> 驱动</span>
+            <span class="text-sm lg:block">主题&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.7.1</a></span>
+        </div>
+        
+            <div class="icp-info my-1"><a target="_blank" rel="nofollow" href="
+                
+                    https://icp.gov.moe/?keyword=20249981
+                
+                ">萌ICP备20249981号</a></div>
+        
+        
+            <div>
+                博客已运行 <span class="odometer" id="runtime_days" ></span> 天 <span class="odometer" id="runtime_hours"></span> 小时 <span class="odometer" id="runtime_minutes"></span> 分钟 <span class="odometer" id="runtime_seconds"></span> 秒
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="article-tools-list">
+        <!-- TOC aside toggle -->
+        
+            <li class="right-bottom-tools page-aside-toggle">
+                <i class="fa-regular fa-outdent"></i>
+            </li>
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-side-tools-container">
+        <div class="side-tools-container">
+    <ul class="hidden-tools-list">
+        <li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+            <i class="fa-regular fa-magnifying-glass-plus"></i>
+        </li>
+
+        <li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+            <i class="fa-regular fa-magnifying-glass-minus"></i>
+        </li>
+
+        <li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+            <i class="fa-regular fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+
+        <li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+            <i class="fa-regular fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="visible-tools-list">
+        <li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+            <i class="fa-regular fa-cog fa-spin"></i>
+        </li>
+        
+            <li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+                <i class="arrow-up fas fa-arrow-up"></i>
+                <span class="percent"></span>
+            </li>
+        
+        
+    </ul>
+</div>
+
+    </div>
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+
+</main>
+
+
+    
+<script src="/js/libs/Swup.min.js"></script>
+
+<script src="/js/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+
+
+
+<script src="/js/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/utils.js" type="module"></script>
+
+<script src="/js/main.js" type="module"></script>
+
+<script src="/js/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/layouts/categoryList.js" type="module"></script>
+
+
+
+
+
+    
+<script src="/js/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/layouts/lazyload.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/tools/runtime.js"></script>
+
+    
+<script src="/js/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/libs/Typed.min.js"></script>
+
+  
+<script src="/js/plugins/typed.js" type="module"></script>
+
+
+
+
+
+
+
+
+    
+<script src="/js/libs/anime.min.js"></script>
+
+
+
+<div class="post-scripts" data-swup-reload-script>
+    
+        
+<script src="/js/tools/tocToggle.js" type="module"></script>
+
+<script src="/js/layouts/toc.js" type="module"></script>
+
+<script src="/js/plugins/tabs.js" type="module"></script>
+
+    
+</div>
+
+
+</body>
+</html>
