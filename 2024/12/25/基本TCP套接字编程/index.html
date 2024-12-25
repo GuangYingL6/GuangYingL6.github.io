@@ -13,20 +13,20 @@
     
     <!--- Seo Part-->
     
-    <link rel="canonical" href="http://guangying.com/2024/12/24/套接字编程简介/"/>
+    <link rel="canonical" href="http://guangying.com/2024/12/25/基本tcp套接字编程/"/>
     <meta name="robots" content="index,follow">
     <meta name="googlebot" content="index,follow">
     <meta name="revisit-after" content="1 days">
     
-        <meta name="description" content="套接字地址结构相关">
+        <meta name="description" content="一个完整的TCP客户&#x2F;服务器所需要的基本套接字函数">
 <meta property="og:type" content="article">
-<meta property="og:title" content="套接字编程简介">
-<meta property="og:url" content="http://guangying.com/2024/12/24/%E5%A5%97%E6%8E%A5%E5%AD%97%E7%BC%96%E7%A8%8B%E7%AE%80%E4%BB%8B/index.html">
+<meta property="og:title" content="基本TCP套接字编程">
+<meta property="og:url" content="http://guangying.com/2024/12/25/%E5%9F%BA%E6%9C%ACTCP%E5%A5%97%E6%8E%A5%E5%AD%97%E7%BC%96%E7%A8%8B/index.html">
 <meta property="og:site_name" content="记事本">
-<meta property="og:description" content="套接字地址结构相关">
+<meta property="og:description" content="一个完整的TCP客户&#x2F;服务器所需要的基本套接字函数">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2024-12-24T14:19:16.000Z">
-<meta property="article:modified_time" content="2024-12-24T14:23:51.296Z">
+<meta property="article:published_time" content="2024-12-25T06:48:04.000Z">
+<meta property="article:modified_time" content="2024-12-25T06:50:06.115Z">
 <meta property="article:author" content="GuangYing">
 <meta property="article:tag" content="网络">
 <meta property="article:tag" content="UNIX">
@@ -43,7 +43,7 @@
     
     <title>
         
-            套接字编程简介 -
+            基本TCP套接字编程 -
         
         芝士博客
     </title>
@@ -387,7 +387,7 @@
         <div class="article-title relative w-full">
             
                 <div class="w-full flex items-center pt-6 justify-start">
-                    <h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">套接字编程简介</h1>
+                    <h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">基本TCP套接字编程</h1>
                 </div>
             
             </div>
@@ -408,15 +408,15 @@
                         <div class="article-meta-info">
     <span class="article-date article-meta-item">
         <i class="fa-regular fa-pen-fancy"></i>&nbsp;
-        <span class="desktop">2024-12-24 22:19:16</span>
-        <span class="mobile">2024-12-24 22:19:16</span>
+        <span class="desktop">2024-12-25 14:48:04</span>
+        <span class="mobile">2024-12-25 14:48:04</span>
         <span class="hover-info">创建</span>
     </span>
     
         <span class="article-date article-meta-item">
             <i class="fa-regular fa-wrench"></i>&nbsp;
-            <span class="desktop">2024-12-24 22:23:51</span>
-            <span class="mobile">2024-12-24 22:23:51</span>
+            <span class="desktop">2024-12-25 14:50:06</span>
+            <span class="mobile">2024-12-25 14:50:06</span>
             <span class="hover-info">更新</span>
         </span>
     
@@ -478,84 +478,145 @@
 
 
         <div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
-            <h1 id="套接字地址结构"><a href="#套接字地址结构" class="headerlink" title="套接字地址结构"></a>套接字地址结构</h1><h2 id="IPv4套接字地址结构"><a href="#IPv4套接字地址结构" class="headerlink" title="IPv4套接字地址结构"></a>IPv4套接字地址结构</h2><p>网际套接字地址结构<br>sockaddr_in命名，定义在<code>&lt;netinet/in.h&gt;</code>头文件中</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">struct in_addr &#123;</span><br><span class="line">	in_addr_t   s_addr;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">struct sockaddr_in &#123;</span><br><span class="line">	unit8_t    sin_len;</span><br><span class="line">	//长度字段sin_len</span><br><span class="line">	//为支持OSI协议随4.3BSD-Reno添加的</span><br><span class="line">	//POSIX规范不要求有这个成员</span><br><span class="line">	//有了长度字段才简化了长度可变套接字地址结构的处理</span><br><span class="line">	//无需设置和检查，由内核使用</span><br><span class="line">	</span><br><span class="line">	sa_family_t sin_family;</span><br><span class="line">	in_port_t sin_port;</span><br><span class="line">	struct in_addr sin_addr;</span><br><span class="line">	//POSIX规范只需要以上三个字段</span><br><span class="line">	</span><br><span class="line">	char sin_zero[8];</span><br><span class="line">	//几乎所有的实现都增加了此字段</span><br><span class="line">	//所以所有套接字地址结构大小都至少为16字节</span><br><span class="line">	//总把该字段置为0</span><br><span class="line">	//当捆绑一个非通配的IPv4地址时该字段必须为0</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></div>
-
-<p>套接字地址结构仅在给定主机上使用</p>
+            <p>一个完整的TCP客户&#x2F;服务器程序所需要的基本套接字函数</p>
+<hr>
+<h1 id="socket函数"><a href="#socket函数" class="headerlink" title="socket函数"></a><code>socket</code>函数</h1><p>指定期望的通信协议类型</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys/socket.h&gt;</span><br><span class="line">int socket(int family, int type, int protocol);</span><br><span class="line">返回：若成功则为非负描述符，若出错则为-1</span><br></pre></td></tr></table></figure></div>
+<p>family参数指明协议族<br>type参数指明套接字类型<br>protocol参数为某个协议类型常值<br>    或设为0以选择family和type组合的系统默认值</p>
+<p>并非所有套接字family与type的组合都是有效的</p>
+<p>socket函数成功时返回非负整数：<strong>套接字描述符</strong>，简称sockfd</p>
+<p>AF_XXX和PF_XXX<br>AF_前缀表示地址族<br>PF_前缀表示协议族<br>历史上曾设想：单个协议族可支持多个地址族，PF_值用来创建套接字，AF_值用于套接字地址结构<br>但实际上支持多个地址族的协议族从未实现过，而且PF_值往往与此协议的AF_值相等</p>
+<h1 id="connect函数"><a href="#connect函数" class="headerlink" title="connect函数"></a><code>connect</code>函数</h1><p>TCP客户用connect函数来建立与TCP服务器的连接</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys/socket.h&gt;</span><br><span class="line">int connect(int sockfd, const struct sockaddr *servaddr, socklen_t addrlen);</span><br><span class="line">返回：若成功则为0，若出错则为-1</span><br></pre></td></tr></table></figure></div>
+<p>sockfd：由socket函数返回的套接字描述符<br>servaddr：指向套接字地址结构的指针<br>addrlen：该结构的大小</p>
+<p>客户在调用函数connect前不必非得调用bind函数<br>    如果需要的话，内核会确定源IP地址，并选择一个临时端口作为源端口</p>
+<p>如果是TCP套接字，调用connect函数将激发TCP的三路握手过程<br>    且仅在连接建立成功或出错时才返回<br>出错的可能情况：</p>
 <ul>
-<li>虽然结构总的某些字段(如IP地址和端口号)用在不同主机之前的通信中</li>
-<li>但结构本身并不在主机之间传递</li>
-</ul>
-<h2 id="通用套接字地址结构"><a href="#通用套接字地址结构" class="headerlink" title="通用套接字地址结构"></a>通用套接字地址结构</h2><p>套接字地址结构总以引用形式传递<br>而使用这种参数的函数必须能处理任何协议族的套接字地址结构</p>
-<p>ANSI C后可用void* 通用指针解决<br>但套接字函数在ANSI C之前定义<br>因此在<code>&lt;sys/socket.h&gt;</code>头文件中定义一个通用的套接字地址结构</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">struct sockaddr &#123;</span><br><span class="line">	uint8_t sa_len;</span><br><span class="line">	sa_family_t sa_family;</span><br><span class="line">	char sa_data[14];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
-<p>套接字函数被定义为指向某个通用套接字地址结构的一个指针作为参数之一<br>如：<code>int bind(int, struct sockaddr *, socklen_t);</code><br>因此任何调用都必须将特定协议的套接字地址结构的指针进行类型强制转换，变为通用套接字地址结构指针<br>如：<code>struct sockaddr_in serv;</code><br><code>bind(sockfd, (struct sockaddr *) &amp;serv, sizeof(serv));</code></p>
-<h2 id="IPv6套接字地址结构"><a href="#IPv6套接字地址结构" class="headerlink" title="IPv6套接字地址结构"></a>IPv6套接字地址结构</h2><p>在<code>&lt;netinet/in.h&gt;</code>头文件中定义</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">struct in6_addr &#123;</span><br><span class="line">	unit8_t s6_addr[16];</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">#define SIN6_LEN</span><br><span class="line"></span><br><span class="line">struct sockaddr_in6 &#123;</span><br><span class="line">	unit8_t sin6_len;</span><br><span class="line">	sa_family_t sin6_family;</span><br><span class="line">	in_port_t sin6_port;</span><br><span class="line">	uint_32_t sin6_flowinfo;</span><br><span class="line">	struct in6_addr sin6_addr;</span><br><span class="line">	uint32_t sin6_scope_id;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></div>
-<ul>
-<li>若系统支持套接字地址结构中的长度字段，则SIN6_LEN常值必须定义</li>
-<li>IPv6的地址族是AF_INET6，而IPv4的地址族是AF_INET</li>
-<li>结构中字段的先后顺序做过编排，使得如果sockaddr_in6结构本身是64位对齐的，那么128位的sin6_addr字段也是64位对齐的</li>
-<li>sin6_flowinfo字段分成两个字段：<ul>
-<li>低序20位是流标</li>
-<li>高序12位保留</li>
+<li>TCP客户没有收到SYN分节的相应，则返回ETIMEDOUT错误<ul>
+<li>即超时</li>
 </ul>
 </li>
-<li>对于具备范围的地址，sin6_scope_id字段标识其范围，最常见的是链路局部地址的接口索引</li>
+<li>对客户的SYN的相应是RST(表示复位)，则表明该服务器主机在指定端口上没有进程在等待与之连接<ul>
+<li>是一种<strong>硬错误</strong>，客户一接收到RST就马上返回ECONNREFUSED错误</li>
+<li>RST是TCP发生错误时发送的一种TCP分节<ul>
+<li>产生条件：<ul>
+<li>目的地为某端口的SYN到达，而该端口上没有正在监听的服务器</li>
+<li>TCP想取消一个已有链接</li>
+<li>TCP接收到一个根本不存在的连接上的分节</li>
 </ul>
-<h2 id="新的通用套接字地址结构"><a href="#新的通用套接字地址结构" class="headerlink" title="新的通用套接字地址结构"></a>新的通用套接字地址结构</h2><p>作为IPv6套接字API的一部分定义的新通用套接字地址结构<br>克服了现有的一些缺点<br>足以容纳系统所支持的任何套接字地址结构<br>在<code>&lt;netinet/in.h&gt;</code>头文件中定义</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">struct sockaddr_storage &#123;</span><br><span class="line">	uint8_t ss_len;</span><br><span class="line">	sa_family_t ss_family;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></div>
-<p>相比之下sockaddr存在以下两点差别：</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>客户发出的SYN在中间某个路由器上引发了一个<code>destination unreachable</code>(目的地不可达)ICMP错误<ul>
+<li>则认为是一种<strong>软错误</strong>，客户主机内核保存该消息，并按第一种情况中所述的时间间隔继续发送SYN</li>
+<li>若在某个规定时间后仍未收到响应，则把保存的消息(ICMP错误)作为EHOSTUNREACH或ENETUNREACH错误返回给进程</li>
+<li>也可能是是以下两种情况：<ul>
+<li>按照本地系统转发表，根本没有到达远程系统的路径</li>
+<li>connect调用根本不等待就返回</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>若connect失败则该套接字不再可用，必须关闭，不能对这样的套接字再次调用connect函数</p>
+<h1 id="bind函数"><a href="#bind函数" class="headerlink" title="bind函数"></a><code>bind</code>函数</h1><p>把一个本地协议地址赋予一个套接字<br>对于网际网协议，协议地址是32位的IPv4地址 或 128位的IPv6地址与16位的TCP或UDP端口号的组合</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys/socket.h&gt;</span><br><span class="line">int bind(int sockfd, const struct sockaddr *myaddr, socklen_t addrlen);</span><br><span class="line">返回：若成功则为0，若出错则为-1</span><br></pre></td></tr></table></figure></div>
+<p>myaddr：指向特定于协议的地址结构的指针<br>addrlen：该地址结构的长度</p>
 <ul>
-<li>sockaddr_storage能够满足最苛刻的对齐要求</li>
-<li>sockaddr_storage足够大，能够容纳系统支持的任何套接字地址结构</li>
+<li>服务器在启动时捆绑它们的众所周知端口</li>
+<li>进程可以把一个特定的IP地址捆绑到它的套接字上，但这个IP地址必须属于其所在主机的网络接口之一<ul>
+<li>对于TCP，这就为在该套接字上发送的IP数据报指派了源IP地址</li>
+<li>且 限定该套接字只接收那些目的地为这个IP地址的客户连接</li>
+<li>TCP客户通常不把IP地址捆绑到它的套接字上<ul>
+<li>当连接套接字时，内核将根据所用外出网络接口来选择源IP地址，外出接口则取决于到达服务器所需的路径</li>
+<li>若TCP服务器没有把IP捆绑到套接字上，内核就把客户发送的SYN的目的地址作为服务器的源IP地址</li>
 </ul>
-<p>注：出ss_family和ss_len外，sockaddr_storage结构总的其他字段对用户来说是透明的<br>    sockaddr_storage结构必须类型强制转换成或复制到适合ss_family字段所给出地址类型的套接字地址结构中，才能访问其他字段</p>
-<h1 id="值-结果参数"><a href="#值-结果参数" class="headerlink" title="值-结果参数"></a>值-结果参数</h1><p>函数被调用时，结构大小是一个<strong>值</strong>，告诉内核该结构的大小，这样内核在写该结构时不至于越界<br>当函数返回时，结构大小又是一个<strong>结果</strong>，告诉进程内核在该结构中究竟存储了多少信息</p>
-<p>这种类型的参数称为<strong>值-结果参数</strong></p>
-<h1 id="字节排序函数"><a href="#字节排序函数" class="headerlink" title="字节排序函数"></a>字节排序函数</h1><p>内存中存储两个字节的方法有两种：</p>
-<ul>
-<li>将低序字节存储在起始地址：<strong>小端</strong>字节序</li>
-<li>将高序字节存储在起始地址：<strong>大端</strong>字节序</li>
+</li>
 </ul>
-<p>网际协议使用大端字节序来传送这些多字节整数</p>
-<p>主机字节序和网络字节序之间转换使用以下4个函数：</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;netinet/in.h&gt;</span><br><span class="line"></span><br><span class="line">uint16_t htons(uint16_t host16bitvalue);</span><br><span class="line"></span><br><span class="line">uint32_t htonl(uint32_t host32bitvalue);</span><br><span class="line">均返回：网络字节序的值</span><br><span class="line"></span><br><span class="line">uint16_t ntohs(uint16_t host16bitvalue);</span><br><span class="line"></span><br><span class="line">uint32_t ntohl(uint32_t host32bitvalue);</span><br><span class="line">均返回：主机字节序的值</span><br></pre></td></tr></table></figure></div>
-<p>h代表host<br>n代表network<br>s代表short 现在为一个16为的值(端口号)<br>l代表long 现在为一个32位的值(IPv4地址)</p>
-<p>使用时不关心主机字节序和网络字节序的真是值<br>与网际协议所用字节序相同的系统中，这四个函数通常为空宏</p>
-<p>字节(byte)<br>大多因特网标准使用<strong>八位组</strong>表示一个8位的量</p>
-<h1 id="字节操纵函数"><a href="#字节操纵函数" class="headerlink" title="字节操纵函数"></a>字节操纵函数</h1><p>以b(表示字节)开头的函数起源于4.2BSD，支持套接字函数的系统仍然提供它们<br>mem(表示内存)开头的函数起源于ANSI C标准，支持ANSI C函数库的所有系统都提供它们</p>
-<p>源自Berkeley的函数</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;strings.h&gt;</span><br><span class="line"></span><br><span class="line">void bzero(void *dest, size_t nbytes);</span><br><span class="line"></span><br><span class="line">void bcopy(const void *src, void *dest, size_t nbytes);</span><br><span class="line"></span><br><span class="line">int bcmp(const void *ptrl, const void *ptr2, size_t nbytes);</span><br><span class="line">返回：若相等则为0，否则为非0</span><br></pre></td></tr></table></figure></div>
+</li>
+</ul>
+<p>调用bind可以指定IP地址或接口，可以两者都指定，也可以都不指定</p>
+<p>若指定端口号为0，则内核在bind调用时选择临时端口<br>若指定IP地址为通配地址，内核等到套接字已连接(TCP)或已在套接字上发出数据报(UDP)时才选择一个本地IP地址</p>
+<p>IPv4通配地址由常值INADDR_ANY指定</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">struct sockaddr_in6 serv;</span><br><span class="line">serv.sin6_addr = in6addr_any;</span><br></pre></td></tr></table></figure></div>
 
-<p>ANSI C函数：</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;string.h&gt;</span><br><span class="line"></span><br><span class="line">void *memset(void *dest, int c, size_t len);</span><br><span class="line"></span><br><span class="line">void *memcpy(void *dest, const void *src, size_t bytes);</span><br><span class="line"></span><br><span class="line">int memcmp(const void *ptrl, const void *ptr2, size_t nbytes);</span><br><span class="line">返回：若相等则为0，否则为&lt;0或&gt;0</span><br></pre></td></tr></table></figure></div>
+<p>IPv6存放在一个结构中，于是使用in6addr_any<br>    系统预先分配in6addr_any变量并初始化为常值IN6ADDR_ANY_INIT</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">struct sockaddr_in6 serv;</span><br><span class="line">serv.sin6_addr = in6addr_any;</span><br></pre></td></tr></table></figure></div>
 
-<p>当源字节串与目标字节串重叠时，bcopy能正确处理，但memcpy的结果不确定<br>    此时必须改用ANSI C的memmove函数</p>
-<p>memcpy中指针参数顺序与C中复制语句顺序相同：<br>    <code>dest = src;</code><br>ANSI C的memXXX函数都需要一个长度参数，且总是最后一个参数</p>
-<h1 id="inet-aton、inet-addr、inet-ntoa函数"><a href="#inet-aton、inet-addr、inet-ntoa函数" class="headerlink" title="inet_aton、inet_addr、inet_ntoa函数"></a><code>inet_aton、inet_addr、inet_ntoa</code>函数</h1><p>在点分十进制数串与32位网络字节序二进制之间转换IPv4地址</p>
-<p>较新的函数<code>inet_pton</code>和<code>inet_ntop</code>对IPv4和IPv6地址都适用</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;arpa/inet.h&gt;</span><br><span class="line"></span><br><span class="line">int inet_aton(const char *strptr, struct in_addr *addrptr);</span><br><span class="line">返回：若字符串有效则为1，否则为0</span><br><span class="line"></span><br><span class="line">in_addr_t inet_addr(const char *strptr);</span><br><span class="line">返回：若字符串有效则为32位二进制网络字节序的IPv4地址，否则为INADDR_NONE</span><br><span class="line">对于255.255.255.255(IPv4的优先广播地址)不能由该函数处理</span><br><span class="line">	因为其二进制数被用来指示该函数失败</span><br><span class="line"></span><br><span class="line">char *inet_ntoa(struct in_addr inaddr);</span><br><span class="line">返回：指向一个点分十进制数串的指针</span><br></pre></td></tr></table></figure></div>
-<p>函数以结构为参数是罕见的，更常见的是以指向结构的指针作为参数</p>
-<h1 id="inet-pton、inet-ntop函数"><a href="#inet-pton、inet-ntop函数" class="headerlink" title="inet_pton、inet_ntop函数"></a><code>inet_pton、inet_ntop</code>函数</h1><p>随IPv6出现的新函数，对IPv4和IPv6地址都适用</p>
-<p>p：表达<br>n：数值</p>
-<p>地址表达格式通常为ASCII字符串<br>数值格式则是存放到套接字地址结构中的二进制值</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;arpa/inet.h&gt;</span><br><span class="line"></span><br><span class="line">int inet_pton(int family, const char *strptr, void *addrptr);</span><br><span class="line">返回：若成功则为1，若输入不是有效的表达格式则为0，若出错则为-1</span><br><span class="line"></span><br><span class="line">const char *inet_ntop(int family, const void *addrptr, char *strpr, size_t len);</span><br><span class="line">返回：若成功则为指向结果的指针，若出错则为NULL</span><br></pre></td></tr></table></figure></div>
-<p>这两个函数的family参数既可以是AF_INET也可以是AF_INET6<br>若以不被支持的地址族作为参数，则都返回一个错误，并将errno置为EAFNOSUPPORT</p>
-<p>头文件<code>&lt;netinet/in.h&gt;</code>中有定义：</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#define INET_ADDRSTRLEN 16</span><br><span class="line">#define INET6_ADDRSTRLEN 46</span><br></pre></td></tr></table></figure></div>
-<p>如果len太小，不够容纳结果(包括结尾的空字符)，则返回一个空指针，置errno为ENOSPC</p>
-<p>inet_ntop函数的strptr参数不可为空指针，必须自己分配内存并指定大小</p>
-<p>示例：<br>旧：<code>foo.sin_addr.s_addr = inet_addr(cp);</code><br>新：<code>inet_pton(AF_INET, cp, &amp;foo.sin_addr);</code></p>
-<p>旧：<code>ptr = inet_ntoa(foo.sin_addr);</code><br>新：<code>char str[INET_ADDRSTRLEN];</code><br><code>ptr = inet_ntop(AF_INET, &amp;foo.sin_addr, str, sizeof(str));</code></p>
-<h1 id="sock-ntop和相关函数"><a href="#sock-ntop和相关函数" class="headerlink" title="sock_ntop和相关函数"></a><code>sock_ntop</code>和相关函数</h1><p>inet_ntop需要调用者知道套接字地址结构的格式和地址族<br>这样代码就与协议相关了</p>
-<p>为解决此问题，可自行编写名为sock_ntop的函数</p>
+<p>若让内核为套接字选择临时端口号，则bind不返回所选择的值<br>    因为bind函数第二个参数有const限定<br>    为此必须调用getsockname函数来返回协议地址</p>
+<p>从bind函数返回的一个常见错误是EADDRINUSE(<code>Address already in use</code>，地址已使用)</p>
+<h1 id="listen函数"><a href="#listen函数" class="headerlink" title="listen函数"></a><code>listen</code>函数</h1><p>仅由TCP服务器调用，做两件事</p>
 <ul>
-<li>以指向某个套接字地址结构的指针为参数</li>
-<li>查看结构的内部</li>
-<li>然后调用适当的函数返回该地址的表达格式<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;unp.h&quot;</span><br><span class="line"></span><br><span class="line">char *sock_ntop(const struct sockaddr *sockaddr, socklen_t addrlen);</span><br><span class="line">返回：若成功则为非空指针，出错则为NULL</span><br></pre></td></tr></table></figure></div></li>
+<li>当socket函数创建一个套接字时，被假设为一个主动套接字：一个将调用connect发起连接的客户端套接字<ul>
+<li>listen函数把一个未连接的套接字转换成一个被调套接字，指示内核应接受指向该套接字的连接请求</li>
 </ul>
-<p>注：对结果进行静态存储导致该函数不可重入且非线程安全</p>
+</li>
+<li>函数的第二个参数规定了内核应该为相应套接字排队的最大连接个数<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys/socket.h&gt;</span><br><span class="line">int listen(int sockfd, int backlog);</span><br><span class="line">返回：若成功则为0.若出错则为-1</span><br></pre></td></tr></table></figure></div>
+通常在调用socket和bind后，调用accept前调用</li>
+</ul>
+<p>不要把backlog定义为0，不同的实现对此有不同的解释<br>    如果不想让任何客户连接到你的监听套接字上，那就关掉该监听套接字</p>
+<p><code>if((ptr = getenv(&quot;LISTENQ&quot;)) != NULL)</code><br>    <code>backlog = atoi(ptr);</code><br>允许环境变量LISTENQ覆写由调用者指定的值<br>可由此改变程序指定的backlog值</p>
+<h1 id="accept函数"><a href="#accept函数" class="headerlink" title="accept函数"></a><code>accept</code>函数</h1><p>由TCP服务器调用<br>用于从已完成连接队列队头返回下一个已完成连接<br>如果已完成队列为空，则进程被投入睡眠(假定套接字为默认的阻塞方式)</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys/socket.h&gt;</span><br><span class="line">int accept(int sockfd, struct sockaddr *cliaddr, socklen_t *addrlen);</span><br><span class="line">返回：若成功则为非负描述符，若出错则为-1</span><br></pre></td></tr></table></figure></div>
+<p>dliaddr和addrlen：用来返回已连接的对端进程(客户)的协议地址<br>    addrlen是值-结果参数<br>调用前先将<code>*addrlen</code>所引用的整数置为由cliaddr所指的套接字地址结构的长度<br>返回时，该整数值即为由内核存放在该套接字地址结构内的确切字节</p>
+<p>若accept成功，返回值为内核自动生成的新描述符，代表与所返回的客户的TCP连接<br>对于accept函数，称第一个参数为<strong>监听套接字</strong>描述符<br>    称返回值为<strong>已连接套接字</strong>描述符</p>
+<p>若对返回客户协议地址不感兴趣，可把cliaddr和addrlen均置为空指针</p>
+<h1 id="fork和exec函数"><a href="#fork和exec函数" class="headerlink" title="fork和exec函数"></a><code>fork</code>和<code>exec</code>函数</h1><p>Unix下的fork函数(包括各种变体)的Unix中派生新进程的唯一方法</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">pid_t fork(void);</span><br><span class="line">返回：在子进程中为0，在父进程中为子进程ID，若出错则为-1</span><br></pre></td></tr></table></figure></div>
+<p>调用一次 返回两次</p>
+<p>fork两个经典用法：</p>
+<ul>
+<li>一个进程创建自身副本，这样每个副本都可以在另一个副本执行其他任务的同时处理各自的某个操作<ul>
+<li>网络服务器的典型用法</li>
+</ul>
+</li>
+<li>一个进程想执行另一个程序<ul>
+<li>先fork，在调用exec把自身替换为新的程序</li>
+<li>是shell之类的程序的典型用法</li>
+</ul>
+</li>
+</ul>
+<p>6个exec函数区别：</p>
+<ul>
+<li>待执行的程序文件是由<strong>文件名</strong> 还是 由<strong>路径名</strong>指定</li>
+<li>新程序的参数是一一列出 还是 由一个指针数组来引用</li>
+<li>把调用进程的环境传递给新程序 还是 给新程序指定新的环境</li>
+</ul>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line"></span><br><span class="line">int execl(const char *pathname, const char *arg0, ... /* (char *) 0 */ );</span><br><span class="line"></span><br><span class="line">int execv(const char *pathname, char *const *argv[]);</span><br><span class="line"></span><br><span class="line">int execle(const char *pathname, const char *arg0, ... /* (char *) 0, char *const envp[] */ );</span><br><span class="line"></span><br><span class="line">int execve(const char *pathname, char *const argv[], char *const envp[]);</span><br><span class="line"></span><br><span class="line">int execlp(const char *filename, const char *arg0, ... /* (char *) 0 */ );</span><br><span class="line"></span><br><span class="line">int execvp(const char *filename, char *const argv[]);</span><br><span class="line">均返回：若成功则不返回，若出错则为-1；</span><br></pre></td></tr></table></figure></div>
+<p>只有在出错时才返回到调用者<br>否则，控制将被传递给新程序的起始点，通常就是main函数</p>
+<p>一般只有execve是内核中的系统调用，其他5个都是execve的库函数</p>
+<p>进程在调用exec之前打开着的描述符通常跨exec继续保持打开<br>通常：因为本默认行为可以使fcntl设置的FD_CLOEXEC描述符标志禁止掉</p>
+<h1 id="并发服务器"><a href="#并发服务器" class="headerlink" title="并发服务器"></a>并发服务器</h1><p>典型并发服务器程序的轮廓</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">pid_t pid;</span><br><span class="line">int lisetenfd, connfd;</span><br><span class="line">listenfd = Socket(...);</span><br><span class="line">Bind(listenfd, ...);</span><br><span class="line">Listen(listenfd, LISTENQ);</span><br><span class="line">for( ; ; ) &#123;</span><br><span class="line">	connfd = Accept(listenfd, ...);</span><br><span class="line">	if ( (pid = Fork()) == 0) &#123;</span><br><span class="line">		Close(listenfd);</span><br><span class="line">		doit(connfd);</span><br><span class="line">		Close(connfd);</span><br><span class="line">		exit(0);</span><br><span class="line">	&#125;</span><br><span class="line">	Close(connfd);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>TCP套接字调用close会导致发送一个FIN，随后是正常的TCP连接终止序列<br>父进程对connfd调用close没有终止它与客户的连接：<br>    每个文件或套接字都有一个引用计数<br>    fork返回后描述符被共享(复制)，引用计数为2<br>    引用计数为0时关闭文件</p>
+<h1 id="close函数"><a href="#close函数" class="headerlink" title="close函数"></a><code>close</code>函数</h1><p>通常的Unix close函数也用来关闭套接字，并终止TCP连接</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">int close(int sockfd);</span><br><span class="line">返回：若成功则为0，若出错则为-1</span><br></pre></td></tr></table></figure></div>
+<p>close一个TCP套接字的默认行为：</p>
+<ul>
+<li>把该套接字标记成已关闭，然后立即返回到调用进程</li>
+<li>该套接字描述符不能再由调用进程使用(即read或write的第一个参数)</li>
+<li>而TCP将尝试发送已排队等待发送到对端的任何数据，发送完毕后发生的是正常的TCP连接终止序列</li>
+</ul>
+<p>然而并发服务器中父进程关闭套接字只是导致相应描述符的引用计数值减1<br>若想在某个TCP连接上发送一个FIN，那么可改用shutdown函数代替close</p>
+<p>若父进程不close套接字，将会耗尽套接字资源</p>
+<h1 id="getsockname和getpeername函数"><a href="#getsockname和getpeername函数" class="headerlink" title="getsockname和getpeername函数"></a><code>getsockname</code>和<code>getpeername</code>函数</h1><p>getsockname：返回与某个套接字关联的本地协议地址<br>getpeername：返回与某个套接字关联的外地协议地址</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys/socket.h&gt;</span><br><span class="line">int getsockname(int sockfd, struct sockaddr *localaddr, socklen_t *addrlen);</span><br><span class="line">int getpeername(int sockfd, struct sockaddr *peeraddr, socklen_t *addrlen);</span><br><span class="line">均返回：若成功则为0，若出错则为-1</span><br></pre></td></tr></table></figure></div>
+<p>最后一个参数都是值-结果参数<br>两个函数都得装填由localaddr或peeraddr指针所指的套接字地址结构</p>
+<p>需要这两个函数的理由：</p>
+<ul>
+<li>在一个没有调用bind的TCP客户上，connect成功返回后，getsockname用于返回由内核赋予该连接的本地IP地址和本地端口号</li>
+<li>在以端口号0调用bind(告知内核去选择本地端口号)后，getsockname用于返回由内核赋予的本地端口号</li>
+<li>getsockname可用于获取某个套接字的地址族</li>
+<li>在一个以通配IP地址调用bind的TCP服务器上，与某个客户的连接一旦建立(accept成功返回)<ul>
+<li>getsockname就可以用于返回由内核赋予该连接的本地IP地址</li>
+<li>在这样的调用中，套接字描述符参数必须是已连接套接字的描述符，而不是监听套接字的描述符</li>
+</ul>
+</li>
+<li>当一个服务区是由调用过accept的某个进程调用exec执行程序时，它能够获取客户身份的唯一途径就是调用getpeername</li>
+</ul>
 
         </div>
 
@@ -563,18 +624,18 @@
             <div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
                 <div class="article-copyright-info-container">
     <ul>
-        <li><strong>标题:</strong> 套接字编程简介</li>
+        <li><strong>标题:</strong> 基本TCP套接字编程</li>
         <li><strong>作者:</strong> GuangYing</li>
         <li><strong>创建于
-                :</strong> 2024-12-24 22:19:16</li>
+                :</strong> 2024-12-25 14:48:04</li>
         
             <li>
                 <strong>更新于
-                    :</strong> 2024-12-24 22:23:51
+                    :</strong> 2024-12-25 14:50:06
             </li>
         
         <li>
-            <strong>链接:</strong> http://quebo.cn/2024/12/24/套接字编程简介/
+            <strong>链接:</strong> http://quebo.cn/2024/12/25/基本TCP套接字编程/
         </li>
         <li>
             <strong>
@@ -615,29 +676,14 @@
         
             <div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
                 
-                    <div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
-                        <a class="prev"
-                        rel="prev"
-                        href="/2024/12/25/%E5%9F%BA%E6%9C%ACTCP%E5%A5%97%E6%8E%A5%E5%AD%97%E7%BC%96%E7%A8%8B/"
-                        >
-                            <span class="left arrow-icon flex justify-center items-center">
-                                <i class="fa-solid fa-chevron-left"></i>
-                            </span>
-                            <span class="title flex justify-center items-center">
-                                <span class="post-nav-title-item">基本TCP套接字编程</span>
-                                <span class="post-nav-item">上一篇</span>
-                            </span>
-                        </a>
-                    </div>
-                
                 
                     <div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
                         <a class="next"
                         rel="next"
-                        href="/2024/10/21/8086%E6%B1%87%E7%BC%96/"
+                        href="/2024/12/24/%E5%A5%97%E6%8E%A5%E5%AD%97%E7%BC%96%E7%A8%8B%E7%AE%80%E4%BB%8B/"
                         >
                             <span class="title flex justify-center items-center">
-                                <span class="post-nav-title-item">8086汇编</span>
+                                <span class="post-nav-title-item">套接字编程简介</span>
                                 <span class="post-nav-item">下一篇</span>
                             </span>
                             <span class="right arrow-icon flex justify-center items-center">
@@ -658,8 +704,8 @@
             <div class="post-toc-wrap">
     <div class="post-toc">
         <div class="toc-title">目录</div>
-        <div class="page-title">套接字编程简介</div>
-        <ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A5%97%E6%8E%A5%E5%AD%97%E5%9C%B0%E5%9D%80%E7%BB%93%E6%9E%84"><span class="nav-text">套接字地址结构</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#IPv4%E5%A5%97%E6%8E%A5%E5%AD%97%E5%9C%B0%E5%9D%80%E7%BB%93%E6%9E%84"><span class="nav-text">IPv4套接字地址结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%9A%E7%94%A8%E5%A5%97%E6%8E%A5%E5%AD%97%E5%9C%B0%E5%9D%80%E7%BB%93%E6%9E%84"><span class="nav-text">通用套接字地址结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IPv6%E5%A5%97%E6%8E%A5%E5%AD%97%E5%9C%B0%E5%9D%80%E7%BB%93%E6%9E%84"><span class="nav-text">IPv6套接字地址结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%B0%E7%9A%84%E9%80%9A%E7%94%A8%E5%A5%97%E6%8E%A5%E5%AD%97%E5%9C%B0%E5%9D%80%E7%BB%93%E6%9E%84"><span class="nav-text">新的通用套接字地址结构</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%80%BC-%E7%BB%93%E6%9E%9C%E5%8F%82%E6%95%B0"><span class="nav-text">值-结果参数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%97%E8%8A%82%E6%8E%92%E5%BA%8F%E5%87%BD%E6%95%B0"><span class="nav-text">字节排序函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AD%97%E8%8A%82%E6%93%8D%E7%BA%B5%E5%87%BD%E6%95%B0"><span class="nav-text">字节操纵函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#inet-aton%E3%80%81inet-addr%E3%80%81inet-ntoa%E5%87%BD%E6%95%B0"><span class="nav-text">inet_aton、inet_addr、inet_ntoa函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#inet-pton%E3%80%81inet-ntop%E5%87%BD%E6%95%B0"><span class="nav-text">inet_pton、inet_ntop函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#sock-ntop%E5%92%8C%E7%9B%B8%E5%85%B3%E5%87%BD%E6%95%B0"><span class="nav-text">sock_ntop和相关函数</span></a></li></ol>
+        <div class="page-title">基本TCP套接字编程</div>
+        <ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#socket%E5%87%BD%E6%95%B0"><span class="nav-text">socket函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#connect%E5%87%BD%E6%95%B0"><span class="nav-text">connect函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#bind%E5%87%BD%E6%95%B0"><span class="nav-text">bind函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#listen%E5%87%BD%E6%95%B0"><span class="nav-text">listen函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#accept%E5%87%BD%E6%95%B0"><span class="nav-text">accept函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#fork%E5%92%8Cexec%E5%87%BD%E6%95%B0"><span class="nav-text">fork和exec函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B9%B6%E5%8F%91%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="nav-text">并发服务器</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#close%E5%87%BD%E6%95%B0"><span class="nav-text">close函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#getsockname%E5%92%8Cgetpeername%E5%87%BD%E6%95%B0"><span class="nav-text">getsockname和getpeername函数</span></a></li></ol>
 
     </div>
 </div>
