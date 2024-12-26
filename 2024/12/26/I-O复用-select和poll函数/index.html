@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="计算机 编程 网络 操作系统">
+    
+    <meta name="author" content="GuangYing">
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://guangying.com/2024/12/26/i-o复用-select和poll函数/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+        <meta name="description" content="支撑IO复用的两个函数和其变种">
+<meta property="og:type" content="article">
+<meta property="og:title" content="I&#x2F;O复用:select和poll函数">
+<meta property="og:url" content="http://guangying.com/2024/12/26/I-O%E5%A4%8D%E7%94%A8-select%E5%92%8Cpoll%E5%87%BD%E6%95%B0/index.html">
+<meta property="og:site_name" content="记事本">
+<meta property="og:description" content="支撑IO复用的两个函数和其变种">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-12-26T13:29:46.000Z">
+<meta property="article:modified_time" content="2024-12-26T13:31:30.005Z">
+<meta property="article:author" content="GuangYing">
+<meta property="article:tag" content="网络">
+<meta property="article:tag" content="UNIX">
+<meta property="article:tag" content="编程">
+<meta name="twitter:card" content="summary">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/img/ico.jpg" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/ico.jpg">
+    <meta name="theme-color" content="#429ce3">
+    <link rel="shortcut icon" href="/img/ico.jpg">
+    <!--- Page Info-->
+    
+    <title>
+        
+            I/O复用:select和poll函数 -
+        
+        芝士博客
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/assets/build/styles.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"guangying.com","root":"/","language":"zh-CN"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":true,"auto":false,"list":[]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"tokyo-night-dark"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":6,"number":false,"expand":true,"init_open":true},"copyright":{"enable":true,"default":"cc_by_nc_sa"},"lazyload":true,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#429ce3","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":false,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":true},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"open_graph":true,"google_analytics":{"enable":false,"id":null}},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/wallhaven-wqery6-light.webp","dark":"/images/wallhaven-wqery6-dark.webp"},"title":"去码头搞点芝士","subtitle":{"text":["饿了","我补药吃拼好饭啊啊啊啊啊"],"hitokoto":{"enable":false,"show_author":false,"api":"https://v1.hitokoto.cn"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"style":"default","links":{"github":null,"instagram":null,"zhihu":null,"twitter":null,"email":null,"fa-brands fa-github":"https://github.com/GuangYingL6","fa-solid fa-envelope":"mailto:692466332@qq.com"},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":false,"version":"9.3.0"}},"version":"2.7.1","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"GitHub":{"path":"https://github.com/GuangYingL6","icon":"fa-brands fa-github"},"Google":{"path":"https://www.google.com/","icon":"fa-brands fa-google"},"友链":{"path":"/links/","icon":"fa-solid fa-link"}},"search":{"enable":false,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"blur"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":"我宣布个事啊","show_on_mobile":true,"links":{"档案":{"path":"/archives","icon":"fa-regular fa-archive"},"标签":{"path":"/tags","icon":"fa-regular fa-tags"},"分类":{"path":"/categories","icon":"fa-regular fa-folder"}}},"article_date_format":"auto","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2024/10/17 11:45:14"};
+    window.lang_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 个月前","year":"%s 年前"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+
+    
+        <span class="pjax-progress-bar"></span>
+<!--        <span class="swup-progress-icon">-->
+<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+<!--        </span>-->
+    
+</div>
+
+
+
+<main class="page-container" id="swup">
+
+    
+
+    <div class="main-content-container">
+
+
+        <div class="main-content-header">
+            <header class="navbar-container px-6 md:px-12">
+
+    <div class="navbar-content ">
+        <div class="left">
+            
+                <a class="logo-image" href="/">
+                    <img src="/img/ico.jpg">
+                </a>
+            
+            <a class="logo-title" href="/">
+                
+                芝士博客
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    首页
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   target="_blank" rel="noopener" href="https://github.com/GuangYingL6"
+                                        >
+                                    <i class="fa-brands fa-github fa-fw"></i>
+                                    GITHUB
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   target="_blank" rel="noopener" href="https://www.google.com/"
+                                        >
+                                    <i class="fa-brands fa-google fa-fw"></i>
+                                    GOOGLE
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/links/"
+                                        >
+                                    <i class="fa-solid fa-link fa-fw"></i>
+                                    友链
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-screen w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                首页
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           target="_blank" rel="noopener" href="https://github.com/GuangYingL6"
+                        >
+                            <span>
+                                GITHUB
+                            </span>
+                            
+                                <i class="fa-brands fa-github fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           target="_blank" rel="noopener" href="https://www.google.com/"
+                        >
+                            <span>
+                                GOOGLE
+                            </span>
+                            
+                                <i class="fa-brands fa-google fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/links/"
+                        >
+                            <span>
+                                友链
+                            </span>
+                            
+                                <i class="fa-solid fa-link fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+                
+                    
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full active"
+                           href="/archives"
+                        >
+                            <span>档案</span>
+                            <i class="fa-regular fa-archive fa-sm fa-fw"></i>
+                        </a>
+                    </li>
+                
+                    
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full active"
+                           href="/tags"
+                        >
+                            <span>标签</span>
+                            <i class="fa-regular fa-tags fa-sm fa-fw"></i>
+                        </a>
+                    </li>
+                
+                    
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full active"
+                           href="/categories"
+                        >
+                            <span>分类</span>
+                            <i class="fa-regular fa-folder fa-sm fa-fw"></i>
+                        </a>
+                    </li>
+                
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">7</div>
+        <div class="label text-third-text-color text-sm">标签</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">3</div>
+        <div class="label text-third-text-color text-sm">分类</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">7</div>
+        <div class="label text-third-text-color text-sm">文章</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="main-content-body">
+
+            
+
+            <div class="main-content">
+
+                
+                    <div class="post-page-container flex relative justify-between box-border w-full h-full">
+    <div class="article-content-container">
+
+        <div class="article-title relative w-full">
+            
+                <div class="w-full flex items-center pt-6 justify-start">
+                    <h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">I/O复用:select和poll函数</h1>
+                </div>
+            
+            </div>
+
+        
+            <div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+                <div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+                    <img src="/img/avat.jpg">
+                </div>
+                <div class="info flex flex-col justify-between">
+                    <div class="author flex items-center">
+                        <span class="name text-default-text-color text-lg font-semibold">GuangYing</span>
+                        
+                            <span class="author-label ml-1.5 text-xs px-2 py-0.5 rounded-small text-third-text-color border border-shadow-color-1">Lv1</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2024-12-26 21:29:46</span>
+        <span class="mobile">2024-12-26 21:29:46</span>
+        <span class="hover-info">创建</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2024-12-26 21:31:30</span>
+            <span class="mobile">2024-12-26 21:31:30</span>
+            <span class="hover-info">更新</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/%E7%BD%91%E7%BB%9C/">网络</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+        <span class="article-tags article-meta-item">
+            <i class="fa-regular fa-tags"></i>&nbsp;
+            <ul>
+                
+                    <li>
+                        <a href="/tags/%E7%BD%91%E7%BB%9C/">网络</a>&nbsp;
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/UNIX/">UNIX</a>&nbsp;
+                    </li>
+                
+                    <li>
+                        | <a href="/tags/%E7%BC%96%E7%A8%8B/">编程</a>&nbsp;
+                    </li>
+                
+            </ul>
+        </span>
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        
+
+
+        <div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+            <p>进程需要一种预先告知内核的能力，使得内核一旦发现进程指定的一个或多个I&#x2F;O条件就绪(即输入准备好被读取，或描述符已经能承接更多的输出)，就通知进程<br>这种能力称为I&#x2F;O复用</p>
+<ul>
+<li>由select和poll两个函数支持的</li>
+</ul>
+<p>I&#x2F;O复用典型使用在下列网络应用场合：</p>
+<ul>
+<li>当客户处理多个描述符(通常是交互式输入和网络套接字)时，必须使用I&#x2F;O复用</li>
+<li>一个客户同时处理多个套接字是可能的，不过比较少见</li>
+<li>如果一个TCP服务器即需要处理监听套接字，又要处理已连接套接字，一般就要使用I&#x2F;O复用</li>
+<li>如果一个服务器要处理多个服务或多个协议，一般就要使用I&#x2F;O复用<br>I&#x2F;O复用并非只限于网络编程，许多重要的应用程序也需要使用这项技术</li>
+</ul>
+<h1 id="I-O模型"><a href="#I-O模型" class="headerlink" title="I&#x2F;O模型"></a>I&#x2F;O模型</h1><p>Unix下可用的5中I&#x2F;O模型的基本区别：</p>
+<ul>
+<li>阻塞式I&#x2F;O</li>
+<li>非阻塞式I&#x2F;O</li>
+<li>I&#x2F;O复用(select和poll)</li>
+<li>信号驱动式I&#x2F;O(SIGIO)</li>
+<li>异步I&#x2F;O(POSIX的aio_系列函数)</li>
+</ul>
+<p>一个输入操作通常包括两个不同的阶段：</p>
+<ul>
+<li>等待数据准备好</li>
+<li>从内核向进程复制数据</li>
+</ul>
+<h2 id="阻塞式I-O模型"><a href="#阻塞式I-O模型" class="headerlink" title="阻塞式I&#x2F;O模型"></a>阻塞式I&#x2F;O模型</h2><p>最流行的I&#x2F;O模型<br>默认情况下，所有套接字都是阻塞的</p>
+<ul>
+<li>进程调用systemcall<ul>
+<li>其系统调用直到数据报到达且被复制到应用进程的缓冲区中或者发生错误才返回<br>  最常见的错误是系统调用被信号中断</li>
+</ul>
+</li>
+</ul>
+<p>进程在从调用systemcall开始到它返回的整段时间内是被阻塞的<br>systemcall成功返回后，应用进程开始处理数据报</p>
+<h2 id="非阻塞式I-O模型"><a href="#非阻塞式I-O模型" class="headerlink" title="非阻塞式I&#x2F;O模型"></a>非阻塞式I&#x2F;O模型</h2><p>进程把一个套接字设置成非阻塞是在通知内核：<br>    当所请求的I&#x2F;O操作非得把本进程投入睡眠才能完成时，不要把本进程投入睡眠，而是返回一个错误</p>
+<ul>
+<li>当前几次systemcall时没有数据可返回<ul>
+<li>内核转而立即返回一个EWOULDBLOCK错误</li>
+</ul>
+</li>
+<li>当调用systemcall时已有数据报准备好<ul>
+<li>则被复制到应用进程缓冲区，于是systemcall成功返回</li>
+</ul>
+</li>
+</ul>
+<p>当应用进程对非阻塞描述符循环调用时，称为<strong>轮询</strong><br>应用进程持续轮询内核，以查看某个操作是否就绪<br>    这么做往往耗费大量CPU时间<br>不过这种模型偶尔也会遇到，通常是在专门提供某种功能的系统中才有</p>
+<h2 id="I-O复用模型"><a href="#I-O复用模型" class="headerlink" title="I&#x2F;O复用模型"></a>I&#x2F;O复用模型</h2><p>有了I&#x2F;O复用，就可以调用select或poll，阻塞在这两个系统调用中的某一个之上，而不是阻塞在真正的I&#x2F;O系统调用上</p>
+<ul>
+<li>阻塞于select调用，等待数据报套接字变为可读</li>
+<li>当select返回套接字可读这一条件时，调用systemcall把所读数据复制到应用进程缓冲区</li>
+</ul>
+<p>由于使用select需要两个而不是单个系统调用，I&#x2F;O复用还稍有劣势<br>但使用select的优势在于可以等待多个描述符就绪</p>
+<p>与I&#x2F;O复用密切相关的是在多线程中使用阻塞式I&#x2F;O<br>    使用多个线程，每个线程可以自由调用阻塞式I&#x2F;O系统调用</p>
+<h2 id="信号驱动式I-O模型"><a href="#信号驱动式I-O模型" class="headerlink" title="信号驱动式I&#x2F;O模型"></a>信号驱动式I&#x2F;O模型</h2><p>可使用信号，让内核在描述符就绪时发送SIGIO信号通知进程</p>
+<ul>
+<li>先开启套接字的信号驱动式I&#x2F;O功能，并通过sigaction系统调用安装一个信号处理函数</li>
+<li>该系统调用将立即返回，进程继续工作，即没有阻塞</li>
+<li>当数据报准备好读取时，内核就为该进程产生一个SIGIO信号</li>
+<li>可以在信号处理函数中调用systemcall读取数据报，并通知主循环数据已经准备好待处理<ul>
+<li>也可以立即通知主循环，让它读取数据报</li>
+</ul>
+</li>
+</ul>
+<p>无论如何处理SIGIO信号，这种模型的优势在于等待数据报到达期间进程不被阻塞<br>主循环可以继续执行，只要等待来自信号处理函数的通知：</p>
+<ul>
+<li>即可以是数据已准备好被处理</li>
+<li>也可以是数据报已经准备好被读取</li>
+</ul>
+<h2 id="异步I-O模型"><a href="#异步I-O模型" class="headerlink" title="异步I&#x2F;O模型"></a>异步I&#x2F;O模型</h2><p>这些函数的工作机制：<br>告知内核启动某个操作，并让内核在整个操作(包括将数据从内核复制到自己的缓冲区)完成之后通知进程</p>
+<p>与信号驱动模型的主要区别在于：</p>
+<ul>
+<li>信号驱动式I&#x2F;O是由内核通知何时可启动一个I&#x2F;O操作</li>
+<li>而异步I&#x2F;O模型是由内核通知进程I&#x2F;O操作何时完成</li>
+</ul>
+<h2 id="各种I-O模型的比较"><a href="#各种I-O模型的比较" class="headerlink" title="各种I&#x2F;O模型的比较"></a>各种I&#x2F;O模型的比较</h2><p>前四中模型主要区别在于第一阶段<br>因为它们第二阶段是一样的：<br>    在数据从内核复制到调用者的缓冲区期间，进程阻塞于systemcall调用</p>
+<p>相反，异步I&#x2F;O模型在这两个阶段都要处理，从而不同于其他4种模型</p>
+<h2 id="同步I-O和异步I-O对比"><a href="#同步I-O和异步I-O对比" class="headerlink" title="同步I&#x2F;O和异步I&#x2F;O对比"></a>同步I&#x2F;O和异步I&#x2F;O对比</h2><p>PISIX术语定义：</p>
+<ul>
+<li>同步I&#x2F;O操作：导致请求进程阻塞，直到I&#x2F;O操作完成</li>
+<li>异步I&#x2F;O操作：不导致请求进程阻塞</li>
+</ul>
+<p>因此前4种模型：阻塞式I&#x2F;O模型，非阻塞式I&#x2F;O模型，I&#x2F;O复用模型，信号驱动式I&#x2F;O模型 都是同步I&#x2F;O模型<br>    因为其中真正的I&#x2F;O操作将阻塞进程</p>
+<p>只有异步I&#x2F;O模型与POSIX定义的异步I&#x2F;O相匹配</p>
+<h1 id="select函数"><a href="#select函数" class="headerlink" title="select函数"></a>select函数</h1><p>该函数允许进程指示内核等待多个事件中的任何一个发生，并且只有在一个或多个事件发生或经历一段指定的时间后才唤醒它</p>
+<p>任何描述符都可以使用select来测试</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys/select.h&gt;</span><br><span class="line">#include &lt;sys/time.h&gt;</span><br><span class="line"></span><br><span class="line">int select(int maxfdp1, fd_set *readset, fd_set *writeset, fd_set *exceptset, const struct timeval *timeout);</span><br><span class="line">返回：若有就绪描述符则为其数目，若超时则为0，若出错则为-1</span><br></pre></td></tr></table></figure></div>
+<p>timeout：告知内核等待所指定描述符中的任何一个就绪可花多长时间<br>其timeval结构用于指定这段时间的秒数和微秒数</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">struct timeval &#123;</span><br><span class="line">	long tv_sec;</span><br><span class="line">	long tv_usec;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></div>
+<p>此参数有三种可能：</p>
+<ul>
+<li>永远等待下去<ul>
+<li>仅在有一个描述符准备好I&#x2F;O时才返回</li>
+<li>为此把该参数设置为空指针</li>
+</ul>
+</li>
+<li>等待一段固定时间<ul>
+<li>在有一个描述符准备好I&#x2F;O时返回</li>
+<li>但是不超过由该参数所指向的timeval结构中指定的秒数和微秒数</li>
+</ul>
+</li>
+<li>根本不等待<ul>
+<li>检查描述符后立即返回，称为<strong>轮询</strong></li>
+<li>为此，该参数必须指向一个timeval结构，而且其中的定时器值(由该结构指定的秒数和微秒数)必须为0<br>  前两种情况的等待通常会被进程在等待期间捕获的信号中断，并从信号处理函数返回</li>
+</ul>
+</li>
+</ul>
+<p>不同内核可能会自动重启被中断的select<br>如果为了可移植性，在捕获信号时，必须做好select返回EINTR错误的准备</p>
+<p>尽管timeval结构允许指定一个微秒级的分辨率，然而内核支持的真实分辨率往往粗糙的多</p>
+<p>timeout参数的const限定词表示在返回时不会被select修改<br>若需要知道函数执行剩余的秒数，则需要取得执行前后的系统时间做差值</p>
+<p>readset、writeset、exceptset指定要让内核测试读、写、异常条件的描述符<br>目前支持的异常条件只有两个：</p>
+<ul>
+<li>某个套接字的带外数据的到达</li>
+<li>某个已置为分组模式的伪终端存在可从其主端读取的控制状态信息</li>
+</ul>
+<p>如何给这三盒参数指定描述符是设计上的问题</p>
+<p>select使用<strong>描述符集</strong><br>通常是一个整数数组，其中每个整数中的每一位对应一个描述符<br>如：若使用32位整数，则数组第一个元素对应描述符0<del>31，第二个元素对应描述符32</del>63</p>
+<p>所有实现细节都与应用程序无关，隐藏在名为fd_set的数据类型和一下四个宏中：</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">void FD_ZERO(fd_set *fdset);</span><br><span class="line">void FD_SET(int fd, fd_set *fdset);</span><br><span class="line">void FD_CLR(int fd, fd_set *fdset);</span><br><span class="line">int FD_ISSET(int fd, fd_set *fdset);</span><br></pre></td></tr></table></figure></div>
+
+<p>描述符集的初始化非常重要<br>    因为作为自动变量分配的一个描述符若未初始化，则会引发不可预测的后果</p>
+<p>对于readset，writeset，exceptset三个参数<br>若对某个条件不感兴趣，就可以将其设为空指针</p>
+<p>事实上，如果三个参数都为空，就有了一个比Unix的sleep函数更为精确的定时器(sleep睡眠以秒为最小单位)</p>
+<p>maxfdp1参数指定待测试的描述符个数，其值是待测试的最大描述符加1<br>    描述符0,1,…maxfdp1-1均将被测试</p>
+<p>头文件<code>&lt;sys/select.h&gt;</code>中定义的FD_SETSIZE常值是数据类型fd_set中的描述符总数</p>
+<ul>
+<li>其值通常是1024，不过很少有程序用到那么多描述符</li>
+</ul>
+<p>maxfdp1参数迫使程序员计算所关心的最大描述符并告知内核该值<br>存在这个参数的额外负担纯粹是为了效率</p>
+<p>select函数修改由指针readset、writeset、exceptset所指向的描述符集<br>    因为这三个参数都是值-结果参数</p>
+<p>该函数返回后，使用FD_ISSET宏来测试fd_set数据类型中的描述符</p>
+<ul>
+<li>描述符集内任何与未就绪描述符对应的位返回时均清成0</li>
+<li>为此，每次重新调用select函数时，都得再次把描述符集内所关心的位均置为1</li>
+</ul>
+<p>使用select的常见错误：</p>
+<ul>
+<li>忘了对最大描述符加1</li>
+<li>忘了描述符集是值-结果参数<ul>
+<li>导致调用select时，描述符集内被认为是1的位却实际置为0</li>
+</ul>
+</li>
+</ul>
+<p>该函数返回值表示跨所有描述符集的已就绪的总位数<br>如果在任何描述符就去之前定时器到时，则返回0<br>返回-1表示出错(可能发生，如函数被一个所捕获的信号中断)</p>
+<h2 id="描述符就绪条件"><a href="#描述符就绪条件" class="headerlink" title="描述符就绪条件"></a>描述符就绪条件</h2><p>满足下列四个条件中的任何一个时，套接字准备好读</p>
+<ul>
+<li>该套接字接收缓冲区中的数据字节数大于等于套接字接收缓冲区低水位标记的当前大小<ul>
+<li>对这样的套接字执行读操作不会阻塞并将返回一个大于0的值(即返回准备号读入的数据)</li>
+<li>可以使用SO_RECVLOWAT套接字选项设置该套接字的低水位标记</li>
+<li>对于TCP和UDP套接字而言，默认值为1</li>
+</ul>
+</li>
+<li>该连接的读半部关闭(也就是接收了FIN的TCP连接)<ul>
+<li>对这样的套接字的读操作将不阻塞并返回0(也就是返回EOF)</li>
+</ul>
+</li>
+<li>该套接字是一个监听套接字且已完成的连接数不为0<ul>
+<li>对这样的套接字的accept通常不会阻塞</li>
+</ul>
+</li>
+<li>其上有一个套接字错误待处理<ul>
+<li>对这样的套接字读操作将不阻塞并返回-1(也就是返回一个错误)，同时把errno设置成确切的错误条件</li>
+<li>这些<strong>待处理错误</strong>也可以通过指定SO_ERROR套接字选项调用getsockopt获取并清除</li>
+</ul>
+</li>
+</ul>
+<p>下列四个条件中的任何一个满足时，一个套接字准备好写</p>
+<ul>
+<li>该套接字发送缓冲区中的可用字节数大于等于套接字发送缓冲区低水位标记的当前大小，并且或者该套接字已连接，或者该套接字不需要连接(如UDP套接字)<ul>
+<li>这意味着如果把这样的套接字设置成非阻塞，写操作将不阻塞并返回一个正值(如传输层接受的字节数)</li>
+<li>可以使用SO_SNDLOWAT套接字选项来设置该套接字的低水位标记</li>
+<li>对于TCP和UDP套接字而言，其默认值通常为2048</li>
+</ul>
+</li>
+<li>该连接的写半部关闭<ul>
+<li>对这样的套接字的写操作将产生SIGPIPE信号</li>
+</ul>
+</li>
+<li>使用非阻塞式connect的套接字已建立连接，或者connect已经以失败告终</li>
+<li>其上有一个套接字错误待处理<ul>
+<li>对于这样的套接字的写操作将不阻塞并返回-1(也就是返回一个错误)，同时把errno设置成确切的错误条件</li>
+<li>这些待处理的错误也可以通过指定SO_ERROR套接字选项调用getsockopt获取并清除</li>
+</ul>
+</li>
+</ul>
+<p>如果一个套接字存在带外数据或仍处于带外标记，那么它有异常条件待处理</p>
+<p>注意：当某个套接字上发生错误时，它将由select标记为即可读又可写</p>
+<p>接收低水位标记和发送低水位标记的目的在于：<br>    允许应用进程控制在select返回可读或可写条件之前有多少数据可读或有多大空间可用于写</p>
+<p>任何UDP套接字只需要其发送低水位标记小于等于发送缓冲区大小(默认应该总是这种关系)就总是可写的<br>因为UDP套接字不需要连接</p>
+<h2 id="select的最大描述符数"><a href="#select的最大描述符数" class="headerlink" title="select的最大描述符数"></a>select的最大描述符数</h2><p>不重新编译内核的话，FD_SETSIZE的值无法改变</p>
+<p>有些商家正在修改select的实现使其允许进程将FD_SETSIZE定义比默认值更大的某个值<br>然而从可移植性考虑，使用大描述符集需要小心</p>
+<h1 id="使用select的实现样例"><a href="#使用select的实现样例" class="headerlink" title="使用select的实现样例"></a>使用select的实现样例</h1><div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;unp.h&quot;</span><br><span class="line"></span><br><span class="line">void</span><br><span class="line">str_cli(FILE *fp, int sockfd)</span><br><span class="line">&#123;</span><br><span class="line">	int maxfdp1;</span><br><span class="line">	fd_set rset; </span><br><span class="line">	char sendline[MAXLINE], recvline[MAXLINE]; </span><br><span class="line">	</span><br><span class="line">	FD_ZERO(&amp;rset); </span><br><span class="line">	for (; ;) &#123; </span><br><span class="line">		FD_SET(fileno(fp), &amp;rset); </span><br><span class="line">		FD_SET(sockfd, &amp;rset); </span><br><span class="line">		maxfdpl = max(fileno(fp), sockfd) + 1;</span><br><span class="line">		Select(maxfdp1, &amp;rset, NULL, NULL, NULL);</span><br><span class="line"></span><br><span class="line">		if (FD_ISSET(sockfd, &amp;rset)) &#123;</span><br><span class="line">			if (Readline(sockfd, recvline, MAXLINE) == 0)</span><br><span class="line">				err_quit(&quot;str_cli: server terminated prematurely&quot;);</span><br><span class="line">			Fputs(recvline, stdout);</span><br><span class="line">		&#125;</span><br><span class="line">		if (FD_ISSET(fileno(fp), &amp;rset)) &#123;</span><br><span class="line">			if (Fgets(sendline, MAXLINE, fp) == NULL)</span><br><span class="line">				return;</span><br><span class="line">			Writen(sockfd, sendline, strlen(sendline));</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<h1 id="批量输入"><a href="#批量输入" class="headerlink" title="批量输入"></a>批量输入</h1><p>上述代码依旧存在问题<br>对于以等-停方式工作的交互式使用是合适的</p>
+<p>既然客户是从标准输入读并往标准输出中写，在Unix的shell环境下重定向输入输出又很容易，则可以以批量方式运行客户</p>
+<p>问题在于，为提升性能而引入缓冲机制增加了网络应用程序的复杂性<br>select不知道stdio使用了缓冲区，只是从read系统调用的角度指出是否有数据可读，而不是从fgets之类调用的角度考虑<br>fgets返回单个行，而缓冲区中可能还有内容</p>
+<p>解决方法之一是，在select之前使用那个函数，以查看是否存在已经读入而尚未消费的数据</p>
+<p>然而为了处理自定义函数中的缓冲区中即可能有不完整的输入行(需要继续读入)，也可能有一个或多个完整的输入行(可以直接消费)，可能导致复杂度迅速增长难以控制</p>
+<p>后续将解决这些缓冲区问题</p>
+<h1 id="shutdown函数"><a href="#shutdown函数" class="headerlink" title="shutdown函数"></a><code>shutdown</code>函数</h1><p>终止网络连接的通常方法是调用close函数<br>但close有两个限制，可以使用shutdown来避免</p>
+<ul>
+<li>close把描述符引用计数减1，仅在该计数为0时才关闭套接字<ul>
+<li>使用shutdown可以不管引用计数就激发TCP的正常连接终止序列</li>
+</ul>
+</li>
+<li>close终止读和写两个方向的数据传送<ul>
+<li>既然TCP连接是全双工的，有时需要告知对端已经完成了数据发送，即使对端仍有数据要发送给我们</li>
+</ul>
+</li>
+</ul>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys/socket.h&gt;</span><br><span class="line"></span><br><span class="line">int shutdown(int sockfd, int howto);</span><br><span class="line">返回：若成功则为0，若出错则为-1</span><br></pre></td></tr></table></figure></div>
+<p>该函数的行为依赖于howto参数的值<br>SHUT_RD</p>
+<ul>
+<li>关闭连接的读这一半：套接字中不在有数据可接收</li>
+<li>而且套接字接收缓冲区中的现有数据都被丢弃</li>
+<li>进程不能再对这样的套接字调用任何读函数</li>
+<li>对一个TCP套接字这样调用shutdown函数后，由该套接字接收的来自对端的任何数据都被确认，然后悄悄丢弃:(</li>
+</ul>
+<p>SHUT_WR</p>
+<ul>
+<li>关闭连接的写这一半：对于TCP套接字，称为<strong>版关闭</strong></li>
+<li>当前留在套接字发送缓冲区的数据将被发送掉，后跟TCP的正常连接终止序列</li>
+<li>不管套接字描述符的引用计数是否等于0，这样的写半部关闭照样执行</li>
+<li>进程不能再对这样的套接字调用任何写函数</li>
+</ul>
+<p>SHUT_RDWR</p>
+<ul>
+<li>连接的读半部和写半部都关闭：这与调用shutdown两次等效<ul>
+<li>第一次调用指定SHUT_RD</li>
+<li>第二次调用指定SHUT_WR</li>
+</ul>
+</li>
+</ul>
+<p>这三个SHUT_XXX名字由POSIX规范定义<br>howto参数的典型值将会是0(关闭读半部)，1(关闭写半部)和2(读半部和写半部都关闭)</p>
+<h1 id="select问题解决"><a href="#select问题解决" class="headerlink" title="select问题解决"></a>select问题解决</h1><p>改进版本，使用了select和shutdown<br>前者：服务器只要关闭它那一端的连接就会通知客户<br>后者：允许正确的处理批量输入</p>
+<p>此版本废弃了以文本行为中心的代码，改而针对缓冲区操作，从而消除了之前的复杂性问题</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;unp.h&quot;</span><br><span class="line"></span><br><span class="line">void</span><br><span class="line">str_cli(FILE *fp, int sockfd)</span><br><span class="line">&#123;</span><br><span class="line">	int maxfdp1, stdineof;</span><br><span class="line">	fd_set rset; </span><br><span class="line">	char buf[MAXLINE];</span><br><span class="line">	int n;</span><br><span class="line"></span><br><span class="line">	stdineof = 0;</span><br><span class="line">	FD_ZERO(&amp;rset); </span><br><span class="line">	for (; ;) &#123; </span><br><span class="line">		if (stdineof == 0)</span><br><span class="line">			FD_SET(fileno(fp), &amp;rset);</span><br><span class="line">		FD_SET(sockfd, &amp;rset); </span><br><span class="line">		maxfdpl = max(fileno(fp), sockfd) + 1;</span><br><span class="line">		Select(maxfdp1, &amp;rset, NULL, NULL, NULL);</span><br><span class="line"></span><br><span class="line">		if (FD_ISSET(sockfd, &amp;rset)) &#123;</span><br><span class="line">			if (n = Read(sockfd, buf, MAXLINE) == 0) &#123;</span><br><span class="line">				if (stdineof == 1)</span><br><span class="line">					return;</span><br><span class="line">				else</span><br><span class="line">					err_quit(&quot;str_cli: server terminated prematurely&quot;);</span><br><span class="line">			&#125;</span><br><span class="line">			Write(fileno(stdout), buf, n);</span><br><span class="line">		&#125;</span><br><span class="line">		if (FD_ISSET(fileno(fp), &amp;rset)) &#123;</span><br><span class="line">			if ((n = Read(fileno(fp), buf, MAXLINE)) == 0) &#123;</span><br><span class="line">				stdineof = 1;</span><br><span class="line">				Shutdown(sockfd, SHUT_WR);</span><br><span class="line">				FD_CLR(fileno(fp), &amp;rset);</span><br><span class="line">				continue;</span><br><span class="line">			&#125;</span><br><span class="line">			Writen(sockfd, buf, n);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+<p>当在套接字上读到EOF时，如果已在标准输入上遇到EOF，那就是正常的终止<br>如果在标准输入上没有遇到EOF，那么服务器进程已过早终止</p>
+<p>改用read和write对缓冲区而不是文本行进行操作，使得select能够如期工作</p>
+<h1 id="使用select来处理任意客户的单个进程程序"><a href="#使用select来处理任意客户的单个进程程序" class="headerlink" title="使用select来处理任意客户的单个进程程序"></a>使用select来处理任意客户的单个进程程序</h1><p>服务器有单个监听描述符<br>服务器只维护一个读描述符集<br>当客户与服务器建立连接时</p>
+<ul>
+<li>监听描述符变为可读，服务器调用accept</li>
+<li>服务器需要在数组中记录每个新的已连接描述符，并把它添加到描述符集中去</li>
+</ul>
+<p>若客户终止它的连接</p>
+<ul>
+<li>客户TCP发送一个FIN，服务器中的描述符变为可读</li>
+<li>当服务器读这个已连接套接字时，read返回0</li>
+<li>于是关闭该套接字并更新数据结构</li>
+</ul>
+<p>使用单进程和select的TCP服务器程序：初始化</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;unp.h&quot;</span><br><span class="line"></span><br><span class="line">int main(int argc, char **argv)</span><br><span class="line">&#123;</span><br><span class="line">	int i, maxi, maxfd, listenfdm connfd, sockfd;</span><br><span class="line">	int nready, client[FD_SETSIZE];</span><br><span class="line">	ssize_t n;</span><br><span class="line">	fd_set rset, allset;</span><br><span class="line">	char buf[MAXLINE];</span><br><span class="line">	socklen_t clilen;</span><br><span class="line">	struct sockaddr_in cliaddr, servaddr;</span><br><span class="line"></span><br><span class="line">	listenfd = Socket(AF_INET, SOCK_STREAM, 0);</span><br><span class="line"></span><br><span class="line">	bzero(&amp;servaddr, sizeof(servaddr));</span><br><span class="line">	servaddr.sin_family = AF_INET;</span><br><span class="line">	servaddr.sinn_addr.s_addr = htonl(INADDR_ANY);</span><br><span class="line">	servaddr.sin_port = htons(SERV_PORT);</span><br><span class="line"></span><br><span class="line">	Bind(listenfd, (SA *) &amp;servaddr, sizeof(servaddr));</span><br><span class="line"></span><br><span class="line">	Listen(listenfd, LISTENQ);</span><br><span class="line"></span><br><span class="line">	maxfd = listenfd;</span><br><span class="line">	maxi = -1;</span><br><span class="line">	for (i = 0; i &lt; FD_SETSIZE; i++)</span><br><span class="line">		client[i] = -1;</span><br><span class="line">	FD_ZERO(&amp;allset);</span><br><span class="line">	FD_SET(listenfd, &amp;allset);</span><br></pre></td></tr></table></figure></div>
+
+<p>使用单进程和select的TCP服务器程序：循环</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">	for( ; ; ) &#123;</span><br><span class="line">		rset = allset;</span><br><span class="line">		nready = Select(maxfd+1, &amp;rset, NULL, NULL. NULL);</span><br><span class="line"></span><br><span class="line">		if (FD_ISSET(listenfd, &amp;rset)) &#123;</span><br><span class="line">			clilen = sizeof(cliaddr);</span><br><span class="line">			connfd = Accept(listenfd, (SA *) &amp;cliaddr, &amp;clilen);</span><br><span class="line"></span><br><span class="line">			for (i = 0; i &lt; FD_SETSIZE; i++)</span><br><span class="line">				if (client[i] &lt; 0) &#123;</span><br><span class="line">					client[i] = connfd;</span><br><span class="line">					break;</span><br><span class="line">				&#125;</span><br><span class="line">			if (i == FD_SETSIZE)</span><br><span class="line">				err_quit(&quot;too many clients&quot;);</span><br><span class="line"></span><br><span class="line">			FD_SET(connfd, &amp;allset);</span><br><span class="line">			if (connfd &gt; maxfd);</span><br><span class="line">				maxfd = connfd;</span><br><span class="line">			if (i &gt; maxi)</span><br><span class="line">				maxi = i;</span><br><span class="line"></span><br><span class="line">			if (--nready &lt;= 0)</span><br><span class="line">				contrinue;</span><br><span class="line">		&#125;</span><br><span class="line">		for (i = 0; i &lt;= maxi; i++) &#123;</span><br><span class="line">			if ((sockfd = client[i]) &lt; 0)</span><br><span class="line">				continue;</span><br><span class="line">			if (FD_ISSET(sockfd, &amp;rset)) &#123;</span><br><span class="line">				if ((n = Read(sockfd, buf, MAXLINE)) == 0) &#123;</span><br><span class="line">					Close(sockfd);</span><br><span class="line">					FD_CLR(sockfd, &amp;allset);</span><br><span class="line">					client[i] = -1;</span><br><span class="line">				&#125; else</span><br><span class="line">					Writen(sockfd, buf, n);</span><br><span class="line"></span><br><span class="line">				if (--nready &lt;= 0)</span><br><span class="line">					break;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>该程序依旧存在问题，但通过将监听套接字设置成非阻塞，然后检查并忽略来自accept的若干错误可以很容易的解决该问题</p>
+<h2 id="拒绝服务型攻击"><a href="#拒绝服务型攻击" class="headerlink" title="拒绝服务型攻击"></a>拒绝服务型攻击</h2><p>服务器可能因为某个用户而阻塞于下一个read调用，以等待来自该客户的其余数据<br>服务器因这一个客户而被阻塞，直到客户发出一个换行符或终止为止</p>
+<p>此处一个基本概念是：</p>
+<ul>
+<li>当一个服务器在处理多个客户时，绝对不能阻塞与只与单个客户相关的某个函数调用</li>
+<li>否则可能导致服务器被挂起，拒绝为所有其他客户提供服务<br>这就是所谓的<strong>拒绝服务</strong>型攻击</li>
+<li>它是针对服务器做些动作，导致服务器不能再为其他合法用户提供服务<br>可能的解决方法包括：</li>
+<li>使用非阻塞式I&#x2F;O</li>
+<li>让每个客户由单独的控制线程提供服务(创建一个子进程&#x2F;线程来服务每个用户)</li>
+<li>对I&#x2F;O操作设置一个超时</li>
+</ul>
+<h1 id="pselect函数"><a href="#pselect函数" class="headerlink" title="pselect函数"></a>pselect函数</h1><p>pselect函数是由POSIX发明的，如今有许多Unix变种支持它</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys/select.h&gt;</span><br><span class="line">#include &lt;signal.h&gt;</span><br><span class="line">#include &lt;time.h&gt;</span><br><span class="line"></span><br><span class="line">int pselect(int maxfdp1, fd_set *readset, fd_set *writeset, fd_set *exceptset, const struct timespec *timeout, const sigset_t *sigmask);</span><br><span class="line">返回：若有就绪描述符则为其数目，若超时则为0，若出错则为-1</span><br></pre></td></tr></table></figure></div>
+
+<p>pselect相对于通常的select有两个变化</p>
+<ul>
+<li><p>pselect使用timespec结构，而不使用timeval结构<br>timespec结构是POSIX的又一个发明</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">struct timespec &#123;</span><br><span class="line">	time_t tv_sec;</span><br><span class="line">	long tv_nsec;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></div>
+<p>两个结果区别于第二个成员：新结构的该成员tv_nsec指定纳秒数<br>  而旧结果的该成员tv_usec指定微秒数</p>
+</li>
+<li><p>pselect函数增加了第六个参数：指向信号掩码的指针</p>
+<ul>
+<li>该参数允许程序先进制递交某些信号</li>
+<li>再测试由这些当前被禁止信号的信号处理函数设置的全局变量</li>
+<li>然后调用pselect，告诉它重新设置信号掩码<br>  下面例子：<br>  这个程序的SIGINT信号处理函数仅仅设置全局变量intr_flag并返回<br>  如果进程阻塞与select调用，那么从信号处理函数的返回将会导致select返回EINTR错误<br>  然而调用select时：<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">if (intr_flag)</span><br><span class="line">	handle_intr();</span><br><span class="line">if ((nready = select(...)) &lt; 0) &#123;</span><br><span class="line">	if (errno == EINTR) &#123;</span><br><span class="line">		if (intr_flag)</span><br><span class="line">			handle_intr();</span><br><span class="line">	&#125;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+但是有问题，在测试intr_flag和调用select之间如果有信号发生，且如果select此时永远阻塞<br>  则该信号看起来如同丢失了一般<br>有了pselect后，则可以编写可靠的例子：<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">sigset_t newmask, oldmask, zeromask;</span><br><span class="line"></span><br><span class="line">sigemptyset(&amp;zeromask);</span><br><span class="line">sigemptyset(&amp;newmask);</span><br><span class="line">sigaddset(&amp;newmask, SIGINT);</span><br><span class="line"></span><br><span class="line">sigprocmask(SIG_BLOCK, &amp;newmask, &amp;oldmask);</span><br><span class="line">if (intr_flag)</span><br><span class="line">	handle_intr();</span><br><span class="line">if ((nready = pselect( ... , &amp;zeromask)) &lt; 0) &#123;</span><br><span class="line">	if (errno == EINTR) &#123;</span><br><span class="line">		if (intr_flag)</span><br><span class="line">			handle_intr();</span><br><span class="line">	&#125;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div></li>
+</ul>
+</li>
+<li><p>在测试intr_flag变量前，阻塞SIGINT</p>
+</li>
+<li><p>当pselect被调用时，先以空集(zeromask)替代进程的信号掩码，在检查描述符，并可能进入睡眠</p>
+</li>
+<li><p>然而当pselect函数返回时，进程的信号掩码又被重置为调用pselect之前的值(SIGINT被阻塞)</p>
+</li>
+</ul>
+<p>(我觉得是将对应的信号处理限制在pselect执行期间 以确保pselect执行后若发生SIGINT信号事件并返回 可通过errno判断变量，信号不会丢失)</p>
+<h1 id="poll函数"><a href="#poll函数" class="headerlink" title="poll函数"></a>poll函数</h1><p>起源于SVR3，最初局限于流设备<br>SVR4取消了这种限制，允许poll工作在任何描述符上</p>
+<p>poll提供的功能与select相似，但在处理流设备时，能够提供额外的信息</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;poll.h&gt;</span><br><span class="line"></span><br><span class="line">int poll(struct pollfd *fdarray, unsigned long nfds, int timeout);</span><br><span class="line">返回：若有就绪描述符则为其数目，若超时则为0，若出错则为-1</span><br></pre></td></tr></table></figure></div>
+<p>fdarray：指向一个结构数组第一个元素的指针<br>每一个数组元素都是一个pollfd结构，用于指定测试某个给定描述符fd的条件</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">struct pollfd &#123;</span><br><span class="line">	int fd;</span><br><span class="line">	short events;</span><br><span class="line">	short revents;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></div>
+<p>要测试的条件由events成员指定<br>函数在相应的revents成员中返回该描述符的状态<br>(每个描述符有两个变量，一个调用值，一个返回结果，从而避免使用值-结果参数)<br>这两个成员中的每一个都由指定某个特定条件的一位或多位构成</p>
+<p>指定events标志以及测试revents标志的一些常值可分为三部分：</p>
+<ul>
+<li>处理输入的四个常值</li>
+<li>处理输出的三个常值</li>
+<li>处理错误的三个常值<ul>
+<li>这三个常值不能再events中设置</li>
+<li>但当相应条件存在时就在revents中返回</li>
+</ul>
+</li>
+</ul>
+<p>poll识别三类数据：普通、优先级带、高优先级<br>    这些术语均出自基于流的实现</p>
+<p>POLLIN可被定义为POLLRDNORM和POLLRDBAND的逻辑或<br>POLLIN、POLLOUT为向后兼容继续保留</p>
+<p>就TCP和UDP套接字而言，以下条件引起poll返回特定的revent<br>    但POSIX在poll的定义中留了许多空洞(有多种方法可返回相同的条件)</p>
+<ul>
+<li>所有正规TCP数据和所有UDP数据都被认为是普通数据</li>
+<li>TCP的带外数据被认为是优先级带数据</li>
+<li>当TCP连接的读半部关闭时(如收到来自对端的FIN)，也被认为是普通数据，随后的读操作将返回0</li>
+<li>TCP连接存在错误即可认为是普通数据，也可认为是错误(POLLERR)<ul>
+<li>无论哪种情况，随后的读操作将返回-1，并把errno设置成合适的值</li>
+<li>这可用于处理诸如接受到RST或发生超时等条件</li>
+</ul>
+</li>
+<li>在监听套接字上有新的连接可用即可认为是普通数据，也可认为是优先级数据<ul>
+<li>大多数实现视为普通数据</li>
+</ul>
+</li>
+<li>非阻塞式connect的完成被认为是使相应套接字可写</li>
+</ul>
+<p>结构数组中元素的个数是由nfds参数指定的</p>
+<p>timeout参数指定poll函数返回前等待多长时间<br>    是一个指定等待毫秒数的正值<br>可能取值：</p>
+<ul>
+<li>INFTIM：永远等待</li>
+<li>0：立即返回，不阻塞进程</li>
+<li><blockquote>
+<p>0：等待指定数目的毫秒数</p>
+</blockquote>
+</li>
+</ul>
+<p>若不在关心某个特定描述符，可把与它对应的pollfd结构的fd成员设置成一个负值</p>
+<ul>
+<li>poll函数将忽略这样的pollfd结构的events成员</li>
+<li>返回时将它的revents成员值置为0</li>
+</ul>
+<p>poll不存在select中的FD_SETSIZE和描述符集总最大描述符数目的问题<br>因为分配一个pollfd结构数组并把该数组中元素的数目通知内核成了调用者的责任<br>    内核不在需要知道类似fd_set的固定大小的数据类型</p>
+<p>从可移植性角度考虑，支持select的系统比poll多<br>POSIX还定义了pselect，能够处理信号阻塞并提供了更高时间分辨率的select的增强版本<br>但poll没有被定义类似的东西</p>
+<h1 id="基于poll的TCP回射服务器程序样例"><a href="#基于poll的TCP回射服务器程序样例" class="headerlink" title="基于poll的TCP回射服务器程序样例"></a>基于poll的TCP回射服务器程序样例</h1><p>使用poll函数的TCP服务器程序的前半部分</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">#include &quot;unp.h&quot;</span><br><span class="line">#include &lt;limits.h&gt;</span><br><span class="line"></span><br><span class="line">int main(int argc, char **argv)</span><br><span class="line">&#123;</span><br><span class="line">	int i, maxi, listenfd, connfd, sockfd;</span><br><span class="line">	int nready;</span><br><span class="line">	ssize_t n;</span><br><span class="line">	char buf[MAXLINE];</span><br><span class="line">	socklen_t clilen;</span><br><span class="line">	struct pollfd client[OPEN_MAX];</span><br><span class="line">	struct sockaddr_in cliaddr, servaddr;</span><br><span class="line"></span><br><span class="line">	listenfd = Socket(AF_INET, SOCK_STREAM, 0);</span><br><span class="line"></span><br><span class="line">	bzero(&amp;servaddr, sizeof(servaddr));</span><br><span class="line">	servaddr.sin_family = AF_INET;</span><br><span class="line">	servaddr.sin_addr.s_addr = htonl(INADDR_ANY);</span><br><span class="line">	servaddr.sin_port = htons(SERV_PORT);</span><br><span class="line"></span><br><span class="line">	Bind(listenfd, (SA *) &amp;servaddr, sizeof(servaddr));</span><br><span class="line"></span><br><span class="line">	Listen(listenfd, LISTENQ);</span><br><span class="line"></span><br><span class="line">	client[0].fd = listenfd;</span><br><span class="line">	client[0].events = POLLRDNORM;</span><br><span class="line">	for (i = 1; i &lt; OPEN_MAX; i++)</span><br><span class="line">		client[i].fd = -1;</span><br><span class="line">	maxi = 0;</span><br></pre></td></tr></table></figure></div>
+<p>为确定一个进程任何时刻能够打开的最大描述符数目并不容易<br>解决方法之一是：以参数_SC_OPEN_MAX调用POSIX的sysconf函数，返回动态分配一个合适大小的数组</p>
+<ul>
+<li>然而sysconf的可能返回之一是<code>&quot;indeterminate&quot;</code>(不确定)<br>意味着仍然不得不猜测一个值</li>
+</ul>
+<p>后半部分</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">	for ( ; ; ) &#123;</span><br><span class="line">		nready = Poll(client, maxi + 1, INFTIM);</span><br><span class="line"></span><br><span class="line">		if (client[0].revents &amp; POLLRDNORM) &#123;</span><br><span class="line">			clilen = sizeof(cliaddr);</span><br><span class="line">			connfd = Accept(listenfd, (SA *) &amp;cliaddr, &amp;clilen);</span><br><span class="line"></span><br><span class="line">			for (i = 1; i &lt; OPEN_MAX; i++) </span><br><span class="line">				if (client[i].fd &lt; 0) &#123;</span><br><span class="line">					client[i].fd = connfd;</span><br><span class="line">					break;</span><br><span class="line">				&#125;</span><br><span class="line">			if (i == OPEN_MAX)</span><br><span class="line">				err_quit(&quot;too many clients&quot;);</span><br><span class="line"></span><br><span class="line">			client[i].events = POLLRDNORM;</span><br><span class="line">			if (i &gt; maxi)</span><br><span class="line">				maxi = i;</span><br><span class="line"></span><br><span class="line">			if (-- nready &lt;= 0) </span><br><span class="line">				continue;</span><br><span class="line">		&#125;</span><br><span class="line">		for (i = 1; i &lt;= maxi; i++) &#123;</span><br><span class="line">			if ((sockfd = client[i].fd) &lt; 0) </span><br><span class="line">				continue;</span><br><span class="line">			if (client[i].revents &amp; (POLLRDNORM | POLLERR)) &#123;</span><br><span class="line">				if ((n = read(sockfd, buf, MAXLINE)) &lt; 0) &#123;</span><br><span class="line">					if (errno == ECONNRESET) &#123;</span><br><span class="line">						Close(sockfd);</span><br><span class="line">						client[i].fd = -1;</span><br><span class="line">					&#125; else</span><br><span class="line">						err_sys(&quot;read error&quot;);</span><br><span class="line">				&#125; else if (n == 0) &#123;</span><br><span class="line">					Close(sockfd);</span><br><span class="line">					client[i].fd = -1;</span><br><span class="line">				&#125; else</span><br><span class="line">					Writen(sockfd, buf, n);</span><br><span class="line"></span><br><span class="line">				if (--nready &lt;= 0)</span><br><span class="line">					break;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>检查某个现有连接上的数据<br>检查的两个返回书剑POLLRDNORM和POLLERR<br>    没有在event成员中设置第二个事件，因为它在条件成立时总是返回<br>检查POLLERR的原因在于：<br>    有些实现在一个连接上接收到RST时返回的是POLLERR时间<br>    而其他实现返回的只是POLLRDNORM事件<br>不论哪种情况都调用read<br>当有错误发生时，read返回错误<br>当现有连接由它的客户终止时，将fd成员置为-1</p>
+
+        </div>
+
+        
+            <div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+                <div class="article-copyright-info-container">
+    <ul>
+        <li><strong>标题:</strong> I/O复用:select和poll函数</li>
+        <li><strong>作者:</strong> GuangYing</li>
+        <li><strong>创建于
+                :</strong> 2024-12-26 21:29:46</li>
+        
+            <li>
+                <strong>更新于
+                    :</strong> 2024-12-26 21:31:30
+            </li>
+        
+        <li>
+            <strong>链接:</strong> http://quebo.cn/2024/12/26/I-O复用-select和poll函数/
+        </li>
+        <li>
+            <strong>
+                版权声明:
+            </strong>
+            
+
+            
+                本文章采用 <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a> 进行许可。
+            
+        </li>
+    </ul>
+</div>
+
+            </div>
+        
+
+        
+            <ul class="post-tags-box text-lg mt-1.5 flex-wrap justify-center flex md:hidden">
+                
+                    <li class="tag-item mx-0.5">
+                        <a href="/tags/%E7%BD%91%E7%BB%9C/">#网络</a>&nbsp;
+                    </li>
+                
+                    <li class="tag-item mx-0.5">
+                        <a href="/tags/UNIX/">#UNIX</a>&nbsp;
+                    </li>
+                
+                    <li class="tag-item mx-0.5">
+                        <a href="/tags/%E7%BC%96%E7%A8%8B/">#编程</a>&nbsp;
+                    </li>
+                
+            </ul>
+        
+
+        
+
+        
+            <div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+                
+                
+                    <div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+                        <a class="next"
+                        rel="next"
+                        href="/2024/12/25/%E7%AE%80%E5%8D%95TCP%E5%AE%A2%E6%88%B7%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%9B%B8%E5%85%B3/"
+                        >
+                            <span class="title flex justify-center items-center">
+                                <span class="post-nav-title-item">简单TCP客户服务器相关</span>
+                                <span class="post-nav-item">下一篇</span>
+                            </span>
+                            <span class="right arrow-icon flex justify-center items-center">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+
+        
+    </div>
+
+    
+        <div class="toc-content-container">
+            <div class="post-toc-wrap">
+    <div class="post-toc">
+        <div class="toc-title">目录</div>
+        <div class="page-title">I/O复用:select和poll函数</div>
+        <ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#I-O%E6%A8%A1%E5%9E%8B"><span class="nav-text">I&#x2F;O模型</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%98%BB%E5%A1%9E%E5%BC%8FI-O%E6%A8%A1%E5%9E%8B"><span class="nav-text">阻塞式I&#x2F;O模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%9E%E9%98%BB%E5%A1%9E%E5%BC%8FI-O%E6%A8%A1%E5%9E%8B"><span class="nav-text">非阻塞式I&#x2F;O模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#I-O%E5%A4%8D%E7%94%A8%E6%A8%A1%E5%9E%8B"><span class="nav-text">I&#x2F;O复用模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BF%A1%E5%8F%B7%E9%A9%B1%E5%8A%A8%E5%BC%8FI-O%E6%A8%A1%E5%9E%8B"><span class="nav-text">信号驱动式I&#x2F;O模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%82%E6%AD%A5I-O%E6%A8%A1%E5%9E%8B"><span class="nav-text">异步I&#x2F;O模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%84%E7%A7%8DI-O%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%AF%94%E8%BE%83"><span class="nav-text">各种I&#x2F;O模型的比较</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%8C%E6%AD%A5I-O%E5%92%8C%E5%BC%82%E6%AD%A5I-O%E5%AF%B9%E6%AF%94"><span class="nav-text">同步I&#x2F;O和异步I&#x2F;O对比</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#select%E5%87%BD%E6%95%B0"><span class="nav-text">select函数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%8F%E8%BF%B0%E7%AC%A6%E5%B0%B1%E7%BB%AA%E6%9D%A1%E4%BB%B6"><span class="nav-text">描述符就绪条件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#select%E7%9A%84%E6%9C%80%E5%A4%A7%E6%8F%8F%E8%BF%B0%E7%AC%A6%E6%95%B0"><span class="nav-text">select的最大描述符数</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8select%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%A0%B7%E4%BE%8B"><span class="nav-text">使用select的实现样例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%89%B9%E9%87%8F%E8%BE%93%E5%85%A5"><span class="nav-text">批量输入</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#shutdown%E5%87%BD%E6%95%B0"><span class="nav-text">shutdown函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#select%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3"><span class="nav-text">select问题解决</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8select%E6%9D%A5%E5%A4%84%E7%90%86%E4%BB%BB%E6%84%8F%E5%AE%A2%E6%88%B7%E7%9A%84%E5%8D%95%E4%B8%AA%E8%BF%9B%E7%A8%8B%E7%A8%8B%E5%BA%8F"><span class="nav-text">使用select来处理任意客户的单个进程程序</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%92%E7%BB%9D%E6%9C%8D%E5%8A%A1%E5%9E%8B%E6%94%BB%E5%87%BB"><span class="nav-text">拒绝服务型攻击</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#pselect%E5%87%BD%E6%95%B0"><span class="nav-text">pselect函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#poll%E5%87%BD%E6%95%B0"><span class="nav-text">poll函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8Epoll%E7%9A%84TCP%E5%9B%9E%E5%B0%84%E6%9C%8D%E5%8A%A1%E5%99%A8%E7%A8%8B%E5%BA%8F%E6%A0%B7%E4%BE%8B"><span class="nav-text">基于poll的TCP回射服务器程序样例</span></a></li></ol>
+
+    </div>
+</div>
+        </div>
+    
+</div>
+
+
+
+                
+
+            </div>
+
+            
+
+        </div>
+
+        <div class="main-content-footer">
+            <footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+            <div class="customize-info my-1">不再看一会儿吗O.o</div>
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2024</span>
+              -
+            
+            2024&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">GuangYing</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        共撰写了 7 篇文章
+                    </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">访问人数</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">总访问量</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">由 <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a> 驱动</span>
+            <span class="text-sm lg:block">主题&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.7.1</a></span>
+        </div>
+        
+            <div class="icp-info my-1"><a target="_blank" rel="nofollow" href="
+                
+                    https://icp.gov.moe/?keyword=20249981
+                
+                ">萌ICP备20249981号</a></div>
+        
+        
+            <div>
+                博客已运行 <span class="odometer" id="runtime_days" ></span> 天 <span class="odometer" id="runtime_hours"></span> 小时 <span class="odometer" id="runtime_minutes"></span> 分钟 <span class="odometer" id="runtime_seconds"></span> 秒
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="article-tools-list">
+        <!-- TOC aside toggle -->
+        
+            <li class="right-bottom-tools page-aside-toggle">
+                <i class="fa-regular fa-outdent"></i>
+            </li>
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-side-tools-container">
+        <div class="side-tools-container">
+    <ul class="hidden-tools-list">
+        <li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+            <i class="fa-regular fa-magnifying-glass-plus"></i>
+        </li>
+
+        <li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+            <i class="fa-regular fa-magnifying-glass-minus"></i>
+        </li>
+
+        <li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+            <i class="fa-regular fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+
+        <li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+            <i class="fa-regular fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="visible-tools-list">
+        <li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+            <i class="fa-regular fa-cog fa-spin"></i>
+        </li>
+        
+            <li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+                <i class="arrow-up fas fa-arrow-up"></i>
+                <span class="percent"></span>
+            </li>
+        
+        
+    </ul>
+</div>
+
+    </div>
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+
+</main>
+
+
+    
+<script src="/js/libs/Swup.min.js"></script>
+
+<script src="/js/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+
+
+
+<script src="/js/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/utils.js" type="module"></script>
+
+<script src="/js/main.js" type="module"></script>
+
+<script src="/js/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/layouts/categoryList.js" type="module"></script>
+
+
+
+
+
+    
+<script src="/js/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/layouts/lazyload.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/tools/runtime.js"></script>
+
+    
+<script src="/js/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/libs/Typed.min.js"></script>
+
+  
+<script src="/js/plugins/typed.js" type="module"></script>
+
+
+
+
+
+
+
+
+    
+<script src="/js/libs/anime.min.js"></script>
+
+
+
+<div class="post-scripts" data-swup-reload-script>
+    
+        
+<script src="/js/tools/tocToggle.js" type="module"></script>
+
+<script src="/js/layouts/toc.js" type="module"></script>
+
+<script src="/js/plugins/tabs.js" type="module"></script>
+
+    
+</div>
+
+
+</body>
+</html>
